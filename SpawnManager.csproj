@@ -1,0 +1,72 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>netstandard2.1</TargetFramework>
+        <Nullable>enable</Nullable>
+        <Version>0.1.6</Version>
+        <GamePathDir>C:\Program Files (x86)\Steam\steamapps\common\REPO</GamePathDir>
+        <GameDataDir>$([System.IO.Directory]::GetDirectories("$(GamePathDir)", "*_Data")[0])</GameDataDir>
+        <ManagedDir>$(GameDataDir)\Managed</ManagedDir>
+        <BepInExDir>$(GamePathDir)\BepInEx</BepInExDir>
+        <ProjectDir>$(MSBuildThisFileDirectory)</ProjectDir>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <Reference Include="0Harmony">
+        <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\REPO\BepInEx\core\0Harmony.dll</HintPath>
+      </Reference>
+      <Reference Include="Assembly-CSharp">
+        <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\REPO\REPO_Data\Managed\Assembly-CSharp.dll</HintPath>
+      </Reference>
+      <Reference Include="BepInEx">
+        <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\REPO\BepInEx\core\BepInEx.dll</HintPath>
+      </Reference>
+      <Reference Include="MenuLib">
+        <HintPath>..\Libraries\MenuLib.dll</HintPath>
+      </Reference>
+      <Reference Include="PhotonUnityNetworking">
+        <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\REPO\REPO_Data\Managed\PhotonUnityNetworking.dll</HintPath>
+      </Reference>
+      <Reference Include="PhotonVoice">
+        <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\REPO\REPO_Data\Managed\PhotonVoice.dll</HintPath>
+      </Reference>
+      <Reference Include="Unity.Postprocessing.Runtime">
+        <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\REPO\REPO_Data\Managed\Unity.Postprocessing.Runtime.dll</HintPath>
+      </Reference>
+      <Reference Include="Unity.TextMeshPro">
+        <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\REPO\REPO_Data\Managed\Unity.TextMeshPro.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEngine">
+        <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.dll</HintPath>
+      </Reference>
+      <Reference Include="UnityEngine.CoreModule">
+        <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\REPO\REPO_Data\Managed\UnityEngine.CoreModule.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageFiles Include="Package\**\*.*"/>
+    </ItemGroup>
+
+    <Target Name="CreateZip" AfterTargets="PostBuildEvent" Condition=" '$(Configuration)' == 'Release' ">
+        <MakeDir Directories="$(OutDir)ReleaseZip" Condition="!Exists('$(OutDir)ReleaseZip')"/>
+        <Copy SourceFiles="$(OutDir)$(AssemblyName).dll" DestinationFolder="$(OutDir)ReleaseZip"/>
+        <Copy SourceFiles="@(PackageFiles)" DestinationFolder="$(OutDir)ReleaseZip\"/>
+
+        <ZipDirectory
+                SourceDirectory="$(OutDir)ReleaseZip"
+                DestinationFile="$(OutDir)$(AssemblyName)-Release.zip"
+                Overwrite="true"/>
+
+        <RemoveDir Directories="$(OutDir)ReleaseZip"/>
+    </Target>
+
+    <PropertyGroup>
+        <ModTestDir>$(BepInExDir)\plugins\$(AssemblyName)\</ModTestDir>
+    </PropertyGroup>
+    <Target Name="CopyToBepInExPlugins" AfterTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
+        <Copy SourceFiles="$(OutDir)$(AssemblyName).dll" DestinationFolder="$(ModTestDir)" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(OutDir)$(AssemblyName).pdb" DestinationFolder="$(ModTestDir)" OverwriteReadOnlyFiles="true" />
+        <Message Text="Copied $(AssemblyName).dll/.pdb to $(ModTestDir)" Importance="High"/>
+    </Target>
+</Project>
