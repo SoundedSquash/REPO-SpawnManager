@@ -8,6 +8,8 @@ namespace SpawnManager
     {
         public static ConfigEntry<string> DisabledEnemies { get; set; }
         
+        public static ConfigEntry<string> DisabledValuables { get; set; }
+        
         public static ManualLogSource Logger { get; private set; }
 
         internal static void Initialize(ConfigFile config, ManualLogSource logger)
@@ -19,14 +21,24 @@ namespace SpawnManager
                 "DisabledList",
                 "",
                 "Comma-separated list of enemy names to disable. (e.g. \"Apex Predator,Headman\")");
+            
+            DisabledValuables = config.Bind(
+                "Valuables",
+                "DisabledList",
+                "",
+                "Comma-separated list of valuable names to disable. (e.g. \"Valuable Television,Valuable Diamond Display\")");
         }
         
         public static List<string> GetDisabledEnemyNames()
         {
-            if (string.IsNullOrEmpty(DisabledEnemies.Value))
+            return ConvertStringToList(DisabledEnemies.Value);
+        }
+        
+        private static List<string> ConvertStringToList(string str)
+        {
+            if (string.IsNullOrEmpty(str))
                 return new List<string>();
-            
-            return new List<string>(DisabledEnemies.Value.Split(','));
+            return new List<string>(str.Split(',', System.StringSplitOptions.RemoveEmptyEntries));
         }
 
         public static void UpdateEnemyEntry(string enemyName, bool enabled)
@@ -55,6 +67,11 @@ namespace SpawnManager
         {
             var disabledEnemies = GetDisabledEnemyNames();
             return !disabledEnemies.Contains(enemyName);
+        }
+        
+        public static List<string> GetDisabledValuableNames()
+        {
+            return ConvertStringToList(DisabledValuables.Value);
         }
     }
 }

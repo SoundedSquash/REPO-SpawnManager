@@ -7,9 +7,9 @@ using UnityEngine;
 
 namespace SpawnManager.Managers
 {
-    public class MenuModManager
+    public static class MenuModManager
     {
-        private static REPOButton currentPageButton;
+        private static REPOButton _currentPageButton;
         
         public static void Initialize()
         {
@@ -44,7 +44,7 @@ namespace SpawnManager.Managers
             var modButtonTemp = modButton = new REPOButton("Enemies", null);
             modButton.SetOnClick(() =>
             {
-                if (currentPageButton == modButtonTemp)
+                if (_currentPageButton == modButtonTemp)
                     return;
 
                 var openPage = new Action(() =>
@@ -53,7 +53,7 @@ namespace SpawnManager.Managers
 
                     enemyPage.ClearButtons();
                     
-                    currentPageButton = modButtonTemp;
+                    _currentPageButton = modButtonTemp;
 
                     var enableAllButton = new REPOButton("Enable All", null);
                     enableAllButton.SetOnClick(() =>
@@ -64,7 +64,7 @@ namespace SpawnManager.Managers
                             {
                                 Settings.DisabledEnemies.BoxedValue = Settings.DisabledEnemies.DefaultValue;
                                 
-                                currentPageButton = null;
+                                _currentPageButton = null;
                                 modButtonTemp.onClick.Invoke();
                             }, "No");
                     });
@@ -108,7 +108,7 @@ namespace SpawnManager.Managers
             var modButtonTemp = modButton = new REPOButton("Enemies", null);
             modButton.SetOnClick(() =>
             {
-                if (currentPageButton == modButtonTemp)
+                if (_currentPageButton == modButtonTemp)
                     return;
 
                 var openPage = new Action(() =>
@@ -117,7 +117,7 @@ namespace SpawnManager.Managers
 
                     enemyPage.ClearButtons();
                     
-                    currentPageButton = modButtonTemp;
+                    _currentPageButton = modButtonTemp;
 
                     var enableAllButton = new REPOButton("Enable All", null);
                     enableAllButton.SetOnClick(() =>
@@ -128,7 +128,7 @@ namespace SpawnManager.Managers
                             {
                                 Settings.DisabledEnemies.BoxedValue = Settings.DisabledEnemies.DefaultValue;
                                 
-                                currentPageButton = null;
+                                _currentPageButton = null;
                                 modButtonTemp.onClick.Invoke();
                             }, "No");
                     });
