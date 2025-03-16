@@ -8,6 +8,7 @@ namespace SpawnManager.Patches
     {
         [HarmonyPatch(nameof(EnemyDirector.AmountSetup))]
         [HarmonyPrefix]
+        [HarmonyPriority(Priority.Last)]
         static void EnemyDirectorAmountSetupPrefix(EnemyDirector __instance)
         {
             EnemyManager.RemoveEnemies();

@@ -3,6 +3,7 @@ using System.Linq;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using MenuLib;
+using SpawnManager.Extensions;
 using UnityEngine;
 
 namespace SpawnManager.Managers
@@ -26,8 +27,11 @@ namespace SpawnManager.Managers
 
             }), new Vector2(77f, 34f));
             
-            CreateEnemyPage(out var modButton);
-            menu.AddElementToScrollView(modButton, new Vector2(0f, -80f + 0 * -34f));
+            CreateEnemyPage(out var enemiesButton);
+            menu.AddElementToScrollView(enemiesButton, new Vector2(0f, -80f + 0 * -34f));
+            
+            CreateValuablePage(out var valuablesButton);
+            menu.AddElementToScrollView(valuablesButton, new Vector2(0f, -80f + 1 * -34f));
 
             return menu;
         }
@@ -36,8 +40,8 @@ namespace SpawnManager.Managers
         {
             var enemyPage = new REPOPopupPage("Enemies", enemyPage =>
             {
-                enemyPage.SetPosition(new Vector2(500.52f, 190.6f));
-                enemyPage.SetSize(new Vector2(310f, 342f));
+                enemyPage.SetPosition(new Vector2(517.00f, 190.6f));
+                enemyPage.SetSize(new Vector2(335f, 342f));
                 enemyPage.SetMaskPadding(new Padding(0, 70, 0, 50));
             });
 
@@ -95,17 +99,16 @@ namespace SpawnManager.Managers
             });
         }
 
-        // TODO
         private static void CreateValuablePage(out REPOButton modButton)
         {
-            var enemyPage = new REPOPopupPage("Enemies", enemyPage =>
+            var valuablePage = new REPOPopupPage("Valuables", valuablePage =>
             {
-                enemyPage.SetPosition(new Vector2(500.52f, 190.6f));
-                enemyPage.SetSize(new Vector2(310f, 342f));
-                enemyPage.SetMaskPadding(new Padding(0, 70, 0, 50));
+                valuablePage.SetPosition(new Vector2(517.00f, 190.6f));
+                valuablePage.SetSize(new Vector2(335f, 342f));
+                valuablePage.SetMaskPadding(new Padding(0, 70, 0, 50));
             });
 
-            var modButtonTemp = modButton = new REPOButton("Enemies", null);
+            var modButtonTemp = modButton = new REPOButton("Valuables", null);
             modButton.SetOnClick(() =>
             {
                 if (_currentPageButton == modButtonTemp)
@@ -115,7 +118,7 @@ namespace SpawnManager.Managers
                 {
                     MenuManager.instance.PageCloseAllAddedOnTop();
 
-                    enemyPage.ClearButtons();
+                    valuablePage.ClearButtons();
                     
                     _currentPageButton = modButtonTemp;
 
@@ -123,10 +126,10 @@ namespace SpawnManager.Managers
                     enableAllButton.SetOnClick(() =>
                     {
                         MenuAPI.OpenPopup($"Enable All", Color.red,
-                            $"Enable all enemies?", "Yes",
+                            $"Enable all valuables?", "Yes",
                             () =>
                             {
-                                Settings.DisabledEnemies.BoxedValue = Settings.DisabledEnemies.DefaultValue;
+                                Settings.DisabledValuables.BoxedValue = Settings.DisabledValuables.DefaultValue;
                                 
                                 _currentPageButton = null;
                                 modButtonTemp.onClick.Invoke();
@@ -134,22 +137,27 @@ namespace SpawnManager.Managers
                     });
 
                     //modPage.AddElementToPage(saveChangesButton, new Vector2(365, 34f));
-                    enemyPage.AddElementToPage(enableAllButton, new Vector2(560f, 34f));
+                    valuablePage.AddElementToPage(enableAllButton, new Vector2(560f, 34f));
                     
-                    var enemiesDictionary = EnemyManager.EnemySpawnList;
-                    var enemyNames = enemiesDictionary.Keys.ToArray();
+                    ValuableManager.RefreshAllValuables();
+                    Settings.Logger.LogDebug($"Refreshed {ValuableManager.ValuableList.Count} valuable names for menu.");
+                    
+                    var valuablesList = ValuableManager.ValuableList.OrderBy(vo => vo.name);
 
                     var yPosition = -80f;
 
-                    foreach (var name in enemyNames)
+                    foreach (var valuableObject in valuablesList)
                     {
-                        enemyPage.AddElementToScrollView(
-                            new REPOToggle(name, b => { Settings.UpdateEnemyEntry(name, b); }, "ON", "OFF",
-                                Settings.IsEnemyEnabled(name)), new Vector2(120f, yPosition));
+                        valuablePage.AddElementToScrollView(
+                            new REPOToggle(valuableObject.FriendlyName(), 
+                                b => { Settings.UpdateValuableEntry(valuableObject.name, b); }, "ON", "OFF",
+                                Settings.IsValuableEnabled(valuableObject.name)
+                                ),
+                            new Vector2(120f, yPosition));
                         yPosition -= 30f;
                     }
 
-                    enemyPage.OpenPage(true);
+                    valuablePage.OpenPage(true);
                 });
                 
                 openPage.Invoke();

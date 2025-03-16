@@ -73,5 +73,33 @@ namespace SpawnManager
         {
             return ConvertStringToList(DisabledValuables.Value);
         }
+
+        public static void UpdateValuableEntry(string valuableName, bool enabled)
+        {
+            var currentList = GetDisabledValuableNames();
+            
+            if (enabled)
+            {
+                currentList.Remove(valuableName);
+            }
+            else
+            {
+                if (!currentList.Contains(valuableName))
+                    currentList.Add(valuableName);
+            }
+            
+            SaveValuableList(currentList);
+        }
+
+        public static void SaveValuableList(List<string> valuableNames)
+        {
+            DisabledValuables.Value = string.Join(",", valuableNames);
+        }
+
+        public static bool IsValuableEnabled(string valuableName)
+        {
+            var disabledValuables = GetDisabledValuableNames();
+            return !disabledValuables.Contains(valuableName);
+        }
     }
 }
