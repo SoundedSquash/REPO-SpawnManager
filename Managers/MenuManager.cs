@@ -14,7 +14,7 @@ namespace SpawnManager.Managers
         
         public static void Initialize()
         {
-            MenuAPI.AddElementToMainMenu(new REPOButton("Spawn Manager", () => CreatePopup().OpenPage(false)), new Vector2(48.3f, 55.5f));
+            MenuAPI.AddElementToMainMenu(new REPOButton("Spawn Manager", () => CreatePopup().OpenPage(false)), new Vector2(550f, 22f));
         }
         
         private static REPOPopupPage CreatePopup()
@@ -40,8 +40,8 @@ namespace SpawnManager.Managers
         {
             var enemyPage = new REPOPopupPage("Enemies", enemyPage =>
             {
-                enemyPage.SetPosition(new Vector2(517.00f, 190.6f));
-                enemyPage.SetSize(new Vector2(335f, 342f));
+                enemyPage.SetPosition(new Vector2(510.00f, 190.6f));
+                enemyPage.SetSize(new Vector2(300f, 342f));
                 enemyPage.SetMaskPadding(new Padding(0, 70, 0, 50));
             });
 
@@ -73,8 +73,22 @@ namespace SpawnManager.Managers
                             }, "No");
                     });
 
-                    //modPage.AddElementToPage(saveChangesButton, new Vector2(365, 34f));
-                    enemyPage.AddElementToPage(enableAllButton, new Vector2(560f, 34f));
+                    var disableAllButton = new REPOButton("Disable All", null);
+                    disableAllButton.SetOnClick(() =>
+                    {
+                        MenuAPI.OpenPopup($"Disable All", Color.red,
+                            $"Disable all valuables?", "Yes",
+                            () =>
+                            {
+                                Settings.DisabledEnemies.Value = string.Join(',', EnemyManager.EnemySpawnList.Select(kvp => kvp.Key));
+                                
+                                _currentPageButton = null;
+                                modButtonTemp.onClick.Invoke();
+                            }, "No");
+                    });
+
+                    enemyPage.AddElementToPage(enableAllButton, new Vector2(360f, 25f));
+                    enemyPage.AddElementToPage(disableAllButton, new Vector2(527f, 25f));
                     
                     EnemyManager.RefreshAllEnemyNames();
                     Settings.Logger.LogDebug("Refreshed enemy names for menu.");
@@ -103,8 +117,8 @@ namespace SpawnManager.Managers
         {
             var valuablePage = new REPOPopupPage("Valuables", valuablePage =>
             {
-                valuablePage.SetPosition(new Vector2(517.00f, 190.6f));
-                valuablePage.SetSize(new Vector2(335f, 342f));
+                valuablePage.SetPosition(new Vector2(510.00f, 190.6f));
+                valuablePage.SetSize(new Vector2(300f, 342f));
                 valuablePage.SetMaskPadding(new Padding(0, 70, 0, 50));
             });
 
@@ -136,8 +150,22 @@ namespace SpawnManager.Managers
                             }, "No");
                     });
 
-                    //modPage.AddElementToPage(saveChangesButton, new Vector2(365, 34f));
-                    valuablePage.AddElementToPage(enableAllButton, new Vector2(560f, 34f));
+                    var disableAllButton = new REPOButton("Disable All", null);
+                    disableAllButton.SetOnClick(() =>
+                    {
+                        MenuAPI.OpenPopup($"Disable All", Color.red,
+                            $"Disable all valuables?", "Yes",
+                            () =>
+                            {
+                                Settings.DisabledValuables.Value = string.Join(',', ValuableManager.ValuableList.Select(vo => vo.name));
+                                
+                                _currentPageButton = null;
+                                modButtonTemp.onClick.Invoke();
+                            }, "No");
+                    });
+
+                    valuablePage.AddElementToPage(enableAllButton, new Vector2(360f, 25f));
+                    valuablePage.AddElementToPage(disableAllButton, new Vector2(527f, 25f));
                     
                     ValuableManager.RefreshAllValuables();
                     Settings.Logger.LogDebug($"Refreshed {ValuableManager.ValuableList.Count} valuable names for menu.");

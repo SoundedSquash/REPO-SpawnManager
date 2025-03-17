@@ -6,11 +6,17 @@ namespace SpawnManager.Patches
     [HarmonyPatch(typeof(EnemyDirector))]
     public static class EnemyDirectorPatches
     {
-        [HarmonyPatch(nameof(EnemyDirector.AmountSetup))]
-        [HarmonyPrefix]
-        [HarmonyPriority(Priority.Last)]
-        static void EnemyDirectorAmountSetupPrefix(EnemyDirector __instance)
+        [HarmonyPatch("Start")]
+        [HarmonyPostfix]
+        static void EnemyDirectorStartPostfix()
         {
+            if (!SemiFunc.RunIsLevel())
+            {
+                EnemyManager.RefreshAllEnemyNames();
+                return;
+            }
+            
+            Settings.Logger.LogDebug("Not on menu level, removing enemies.");
             EnemyManager.RemoveEnemies();
         }
     }

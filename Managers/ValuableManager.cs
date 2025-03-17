@@ -7,6 +7,7 @@ namespace SpawnManager.Managers
     public static class ValuableManager
     {
         public static List<ValuableObject> ValuableList = new List<ValuableObject>();
+        public static Dictionary<string, GameObject> RemovedList = new Dictionary<string, GameObject>();
         
         public static Dictionary<string, LevelValuables> LevelValuablesDictionary = new Dictionary<string, LevelValuables>();
             
@@ -70,11 +71,33 @@ namespace SpawnManager.Managers
             foreach (var obj in list.ToList().Where(obj => valuableObjectsToRemove.Contains(obj.GetComponent<ValuableObject>())))
             {
                 Settings.Logger.LogDebug($"Removed valuable object {obj.name} from list.");
+                // TODO RemovedList.TryAdd(key, obj);
                 list.Remove(obj);
             }
             if (originalCount - list.Count > 0)
             {
                 Settings.Logger.LogDebug($"Removed {originalCount - list.Count} valuable objects from list.");
+            }
+        }
+        
+        public static void RestoreValuableObjects()
+        {
+            // TODO
+            return;
+            if (RemovedList.Count == 0) return;
+            if (RunManager.instance == null || RunManager.instance.levels == null) return;
+            
+            foreach (var level in RunManager.instance.levels.Select(level => new { 
+                         Level = level,
+                         ValuablePresets = level.ValuablePresets }))
+            {
+                // RemoveValuableObjectsFromList(valuablePreset.tiny, valuableObjectsToRemove);
+                // RemoveValuableObjectsFromList(valuablePreset.small, valuableObjectsToRemove);
+                // RemoveValuableObjectsFromList(valuablePreset.medium, valuableObjectsToRemove);
+                // RemoveValuableObjectsFromList(valuablePreset.big, valuableObjectsToRemove);
+                // RemoveValuableObjectsFromList(valuablePreset.wide, valuableObjectsToRemove);
+                // RemoveValuableObjectsFromList(valuablePreset.tall, valuableObjectsToRemove);
+                // RemoveValuableObjectsFromList(valuablePreset.veryTall, valuableObjectsToRemove);
             }
         }
     }

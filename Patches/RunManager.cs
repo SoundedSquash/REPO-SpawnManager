@@ -11,7 +11,12 @@ namespace SpawnManager.Patches
         [HarmonyPriority(Priority.Last)]
         static void RunManagerStartPrefix()
         {
-            if (SemiFunc.MenuLevel()) return;
+            if (SemiFunc.MenuLevel())
+            {
+                ValuableManager.RestoreValuableObjects();
+                return;
+            }
+
             Settings.Logger.LogDebug("Removing valuables.");
             ValuableManager.RemoveValuables();
         }
