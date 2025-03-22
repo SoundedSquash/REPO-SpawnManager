@@ -1,3 +1,6 @@
+## 0.1.3
+- Updated to support MenuLib 2.0.0.
+
 ## 0.1.2
 - Fixed error while loading level when there weren't enough unique valuables. This still requires at least one generic valuable to be enabled.
 - Known Issue: Disabling too many valuables can cause a soft-lock if there is not at least one generic valuable enabled.
