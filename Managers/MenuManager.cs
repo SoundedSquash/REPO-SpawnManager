@@ -34,9 +34,7 @@ namespace SpawnManager.Managers
             );
             
             CreateEnemyPage(menu);
-            
-            // CreateValuablePage(out var valuablesButton);
-            // menu.AddElementToScrollView(parent => valuablesButton, new Vector2(0f, -80f + 1 * -34f));
+            CreateValuablePage(menu);
 
             return menu;
         }
@@ -63,14 +61,16 @@ namespace SpawnManager.Managers
                             {
                                 MenuAPI.OpenPopup($"Enable All", Color.red,
                                     $"Enable all enemies?",
-                                    () => { Settings.DisabledEnemies.BoxedValue = Settings.DisabledEnemies.DefaultValue; });
+                                    () => {
+                                        Settings.DisabledEnemies.BoxedValue = Settings.DisabledEnemies.DefaultValue;
                                         
-                                // Reopen page to refresh
-                                _currentPageButton = null;
-                                button.button.onClick.Invoke();
+                                        // Reopen page to refresh
+                                        _currentPageButton = null;
+                                        button.button.onClick.Invoke();
+                                    });
                             },
                             parent,
-                            new Vector2(360f, 20f)
+                            new Vector2(367f, 20f)
                         )
                     );
 
@@ -117,82 +117,81 @@ namespace SpawnManager.Managers
             });
         }
 
-        private static void CreateValuablePage(out REPOButton modButton)
+        private static void CreateValuablePage(REPOPopupPage menu)
         {
-            var valuablePage = new REPOPopupPage("Valuables", valuablePage =>
+            menu.AddElementToScrollView(parent =>
             {
-                valuablePage.SetPosition(new Vector2(510.00f, 190.6f));
-                valuablePage.SetSize(new Vector2(300f, 342f));
-                valuablePage.SetMaskPadding(new Padding(0, 70, 0, 50));
-            });
-        
-            var modButtonTemp = modButton = new REPOButton("Valuables", null);
-            modButton.SetOnClick(() =>
-            {
-                if (_currentPageButton == modButtonTemp)
-                    return;
-        
-                var openPage = new Action(() =>
+                var button = MenuAPI.CreateREPOButton("Valuables", null, parent, new Vector2(0f, -80f + 1 * -34f));
+                
+                button.button.onClick.AddListener(() =>
                 {
-                    MenuManager.instance.PageCloseAllAddedOnTop();
-        
-                    valuablePage.ClearButtons();
+                    if (_currentPageButton == button)
+                        return;
+
+                    MenuAPI.CloseAllPagesAddedOnTop();
                     
-                    _currentPageButton = modButtonTemp;
-        
-                    var enableAllButton = new REPOButton("Enable All", null);
-                    enableAllButton.SetOnClick(() =>
-                    {
-                        MenuAPI.OpenPopup($"Enable All", Color.red,
-                            $"Enable all valuables?", "Yes",
+                    var valuablePage =
+                        MenuAPI.CreateREPOPopupPage("Valuables", REPOPopupPage.PresetSide.Right);
+
+                    valuablePage.AddElement(parent => 
+                        MenuAPI.CreateREPOButton("Enable All",
                             () =>
                             {
-                                Settings.DisabledValuables.BoxedValue = Settings.DisabledValuables.DefaultValue;
-                                
-                                _currentPageButton = null;
-                                modButtonTemp.onClick.Invoke();
-                            }, "No");
-                    });
-        
-                    var disableAllButton = new REPOButton("Disable All", null);
-                    disableAllButton.SetOnClick(() =>
-                    {
-                        MenuAPI.OpenPopup($"Disable All", Color.red,
-                            $"Disable all valuables?", "Yes",
+                                MenuAPI.OpenPopup($"Enable All", Color.red,
+                                    $"Enable all valuables?",
+                                    () =>
+                                    {
+                                        Settings.DisabledValuables.BoxedValue = Settings.DisabledValuables.DefaultValue;
+
+                                        // Reopen page to refresh
+                                        _currentPageButton = null;
+                                        button.button.onClick.Invoke();
+                                    }
+                                );
+                            },
+                            parent,
+                            new Vector2(367f, 20f)
+                        )
+                    );
+                    
+                    valuablePage.AddElement(parent => 
+                        MenuAPI.CreateREPOButton("Disable All",
                             () =>
                             {
-                                Settings.DisabledValuables.Value = string.Join(',', ValuableManager.ValuableList.Select(vo => vo.name));
-                                
-                                _currentPageButton = null;
-                                modButtonTemp.onClick.Invoke();
-                            }, "No");
-                    });
-        
-                    valuablePage.AddElementToPage(enableAllButton, new Vector2(360f, 25f));
-                    valuablePage.AddElementToPage(disableAllButton, new Vector2(527f, 25f));
-                    
+                                MenuAPI.OpenPopup($"Disable All", Color.red,
+                                    $"Disable all valuables?",
+                                    () =>
+                                    {
+                                        Settings.DisabledValuables.Value = string.Join(',',
+                                            ValuableManager.ValuableList.Select(vo => vo.name));
+                                        
+                                        // Reopen page to refresh
+                                        _currentPageButton = null;
+                                        button.button.onClick.Invoke();
+                                    });
+                            }, parent, new Vector2(536f, 20f)
+                        )
+                    );
                     ValuableManager.RefreshAllValuables();
                     Settings.Logger.LogDebug($"Refreshed {ValuableManager.ValuableList.Count} valuable names for menu.");
                     
                     var valuablesList = ValuableManager.ValuableList.OrderBy(vo => vo.name);
         
-                    var yPosition = -80f;
-        
                     foreach (var valuableObject in valuablesList)
                     {
-                        valuablePage.AddElementToScrollView(
-                            new REPOToggle(valuableObject.FriendlyName(), 
-                                b => { Settings.UpdateValuableEntry(valuableObject.name, b); }, "ON", "OFF",
-                                Settings.IsValuableEnabled(valuableObject.name)
-                                ),
-                            new Vector2(120f, yPosition));
-                        yPosition -= 30f;
+                        valuablePage.AddElementToScrollView(parent =>
+                        {
+                            return MenuAPI.CreateREPOToggle(valuableObject.FriendlyName(),
+                                b => { Settings.UpdateValuableEntry(valuableObject.name, b); },
+                                parent, default, "ON", "OFF",
+                                Settings.IsValuableEnabled(valuableObject.name)).rectTransform;
+                        });
                     }
         
                     valuablePage.OpenPage(true);
                 });
                 
-                openPage.Invoke();
+                return button.rectTransform;
             });
         }
     }
