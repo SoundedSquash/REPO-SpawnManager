@@ -77,7 +77,7 @@ namespace SpawnManager.Managers
                     disableAllButton.SetOnClick(() =>
                     {
                         MenuAPI.OpenPopup($"Disable All", Color.red,
-                            $"Disable all valuables?", "Yes",
+                            $"Disable all enemies?", "Yes",
                             () =>
                             {
                                 Settings.DisabledEnemies.Value = string.Join(',', EnemyManager.EnemySpawnList.Select(kvp => kvp.Key));
