@@ -48,22 +48,6 @@ namespace SpawnManager.Managers
                 director.enemiesDifficulty2.Remove(setup);
                 director.enemiesDifficulty3.Remove(setup);
             }
-            
-            // Check that all enemiesDifficulty lists have at least one item. If not, create an empty one and include a gameobject in the spawnObjects list.
-            var emptyEnemySetup = ScriptableObject.CreateInstance<EnemySetup>();
-            emptyEnemySetup.spawnObjects = new List<GameObject>() { new GameObject("EmptyEnemy") };
-            if (director.enemiesDifficulty1.Count == 0)
-            {
-                director.enemiesDifficulty1.Add(emptyEnemySetup);
-            }
-            if (director.enemiesDifficulty2.Count == 0)
-            {
-                director.enemiesDifficulty2.Add(emptyEnemySetup);
-            }
-            if (director.enemiesDifficulty3.Count == 0)
-            {
-                director.enemiesDifficulty3.Add(emptyEnemySetup);
-            }
         }
     }
 }

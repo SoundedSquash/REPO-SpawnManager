@@ -21,8 +21,8 @@ Please report them on the [GitHub issues page](https://github.com/SoundedSquash/
 ### Manual installation
 If you do not use a mod manager, you can install manually.
 
-Install BepInEx.\
-Place the SpawnManager.dll in the BepInEx\Plugins folder.
+Install the recommended versions of the dependencies above.\
+Place the SpawnManager.dll in the `BepInEx\Plugins` folder.
 
 ### Configuration
 
