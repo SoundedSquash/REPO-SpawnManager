@@ -10,7 +10,7 @@ namespace SpawnManager.Managers
         public static Dictionary<string, GameObject> RemovedList = new Dictionary<string, GameObject>();
         
         public static Dictionary<string, LevelValuables> LevelValuablesDictionary = new Dictionary<string, LevelValuables>();
-            
+        
         public static void RefreshAllValuables()
         {
             if (RunManager.instance != null && RunManager.instance.levels != null)
@@ -62,6 +62,24 @@ namespace SpawnManager.Managers
                 RemoveValuableObjectsFromList(valuablePreset.wide, valuableObjectsToRemove);
                 RemoveValuableObjectsFromList(valuablePreset.tall, valuableObjectsToRemove);
                 RemoveValuableObjectsFromList(valuablePreset.veryTall, valuableObjectsToRemove);
+                
+                var allItems = valuablePreset.tiny.Concat(valuablePreset.small)
+                    .Concat(valuablePreset.medium)
+                    .Concat(valuablePreset.big)
+                    .Concat(valuablePreset.wide)
+                    .Concat(valuablePreset.tall)
+                    .Concat(valuablePreset.veryTall)
+                    .ToList();
+                
+                if (allItems.Count == 0) continue;
+                
+                if (!valuablePreset.tiny.Any()) valuablePreset.tiny.Add(allItems[Random.Range(0, allItems.Count)]);
+                if (!valuablePreset.small.Any()) valuablePreset.small.Add(allItems[Random.Range(0, allItems.Count)]);
+                if (!valuablePreset.medium.Any()) valuablePreset.medium.Add(allItems[Random.Range(0, allItems.Count)]);
+                if (!valuablePreset.big.Any()) valuablePreset.big.Add(allItems[Random.Range(0, allItems.Count)]);
+                if (!valuablePreset.wide.Any()) valuablePreset.wide.Add(allItems[Random.Range(0, allItems.Count)]);
+                if (!valuablePreset.tall.Any()) valuablePreset.tall.Add(allItems[Random.Range(0, allItems.Count)]);
+                if (!valuablePreset.veryTall.Any()) valuablePreset.veryTall.Add(allItems[Random.Range(0, allItems.Count)]);
             }
         }
 
