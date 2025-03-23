@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace SpawnManager.Managers
 {
@@ -15,6 +16,23 @@ namespace SpawnManager.Managers
         {
             if (RunManager.instance != null && RunManager.instance.levels != null)
             {
+                if (AllItems.Count == 0)
+                {
+                    foreach (Level level in RunManager.instance.levels)
+                    {
+                        foreach (var valuablePreset in level.ValuablePresets)
+                        {
+                            AddItemsToDictionary(valuablePreset.tiny, level.name, ValuablePresetType.Tiny);
+                            AddItemsToDictionary(valuablePreset.small, level.name, ValuablePresetType.Small);
+                            AddItemsToDictionary(valuablePreset.medium, level.name, ValuablePresetType.Medium);
+                            AddItemsToDictionary(valuablePreset.big, level.name, ValuablePresetType.Big);
+                            AddItemsToDictionary(valuablePreset.wide, level.name, ValuablePresetType.Wide);
+                            AddItemsToDictionary(valuablePreset.tall, level.name, ValuablePresetType.Tall);
+                            AddItemsToDictionary(valuablePreset.veryTall, level.name, ValuablePresetType.VeryTall);
+                        }
+                    }
+                }
+
                 ValuableList = RunManager.instance.levels.SelectMany(l => l.ValuablePresets ?? Enumerable.Empty<LevelValuables>())
                     .SelectMany(lv => (lv?.tiny ?? Enumerable.Empty<GameObject>())
                         .Concat(lv?.small ?? Enumerable.Empty<GameObject>())
@@ -118,5 +136,81 @@ namespace SpawnManager.Managers
                 // RemoveValuableObjectsFromList(valuablePreset.veryTall, valuableObjectsToRemove);
             }
         }
+        
+        public enum ValuablePresetType
+        {
+            Tiny,
+            Small,
+            Medium,
+            Big,
+            Wide,
+            Tall,
+            VeryTall
+        }
+
+        public static string GetValuablePresetTypePath(ValuablePresetType type)
+        {
+            if (type == ValuablePresetType.Tiny)
+            {
+                return "01 Tiny";
+            }
+
+            if (type == ValuablePresetType.Small)
+            {
+                return "02 Small";
+            }
+
+            if (type == ValuablePresetType.Medium)
+            {
+                return "03 Medium";
+            }
+
+            if (type == ValuablePresetType.Big)
+            {
+                return "04 Big";
+            }
+
+            if (type == ValuablePresetType.Wide)
+            {
+                return "05 Wide";
+            }
+
+            if (type == ValuablePresetType.Tall)
+            {
+                return "06 Tall";
+            }
+
+            if (type == ValuablePresetType.VeryTall)
+            {
+                return "07 Very Tall";
+            }
+
+            return "Valuable Size Not Found - Spawn Manager";
+        }
+
+        public static Dictionary<string, ValuableMetaData> AllItems = new Dictionary<string, ValuableMetaData>();
+
+        static void AddItemsToDictionary(List<GameObject> list, string levelName, ValuablePresetType type)
+        {
+            foreach (var item in list)
+            {
+                if (item != null)
+                {
+                    AllItems.TryAdd(item.name, new ValuableMetaData(levelName, type));
+                }
+            }
+        }
+    }
+    
+    public class ValuableMetaData
+    {
+        public ValuableMetaData(string levelName, ValuableManager.ValuablePresetType presetType)
+        {
+            LevelName = levelName;
+            PresetType = presetType;
+        }
+
+        public string LevelName { get; set; }
+        public ValuableManager.ValuablePresetType PresetType { get; set; }
     }
 }
