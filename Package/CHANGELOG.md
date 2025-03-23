@@ -1,3 +1,6 @@
+## 0.1.4
+- Fixed error while loading level in a multiplayer lobby.
+
 ## 0.1.3
 - Updated to support MenuLib 2.0.0.
 
