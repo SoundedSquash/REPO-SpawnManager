@@ -25,7 +25,7 @@ namespace SpawnManager.Managers
         
         private static REPOPopupPage CreatePopup()
         {
-            var menu = MenuAPI.CreateREPOPopupPage("Spawn Manager", REPOPopupPage.PresetSide.Left, true);
+            var menu = MenuAPI.CreateREPOPopupPage("Spawn Manager", REPOPopupPage.PresetSide.Left, false, true);
             menu.AddElement(parent => 
                 MenuAPI.CreateREPOButton("Back", 
                 () => menu.ClosePage(true),
@@ -53,7 +53,7 @@ namespace SpawnManager.Managers
                     MenuAPI.CloseAllPagesAddedOnTop();
 
                     var enemyPage =
-                        MenuAPI.CreateREPOPopupPage("Enemies", REPOPopupPage.PresetSide.Right);
+                        MenuAPI.CreateREPOPopupPage("Enemies", REPOPopupPage.PresetSide.Right, false, false);
 
                     enemyPage.AddElement(parent => 
                         MenuAPI.CreateREPOButton("Enable All",
@@ -131,7 +131,7 @@ namespace SpawnManager.Managers
                     MenuAPI.CloseAllPagesAddedOnTop();
                     
                     var valuablePage =
-                        MenuAPI.CreateREPOPopupPage("Valuables", REPOPopupPage.PresetSide.Right);
+                        MenuAPI.CreateREPOPopupPage("Valuables", REPOPopupPage.PresetSide.Right, false, false);
 
                     valuablePage.AddElement(parent => 
                         MenuAPI.CreateREPOButton("Enable All",
