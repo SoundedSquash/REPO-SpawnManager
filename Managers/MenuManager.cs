@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using MenuLib;
 using MenuLib.MonoBehaviors;
-using MenuLib.Structs;
 using SpawnManager.Extensions;
 using UnityEngine;
 
@@ -10,7 +8,7 @@ namespace SpawnManager.Managers
 {
     public static class MenuModManager
     {
-        private static REPOButton _currentPageButton;
+        private static REPOButton? _currentPageButton;
         
         public static void Initialize()
         {
@@ -45,7 +43,7 @@ namespace SpawnManager.Managers
             {
                 var button = MenuAPI.CreateREPOButton("Enemies", null, parent, new Vector2(0f, -80f + 0 * -34f));
 
-                button.button.onClick.AddListener(() =>
+                button.onClick = () =>
                 {
                     if (_currentPageButton == button)
                         return;
@@ -55,7 +53,7 @@ namespace SpawnManager.Managers
                     var enemyPage =
                         MenuAPI.CreateREPOPopupPage("Enemies", REPOPopupPage.PresetSide.Right, false, false);
 
-                    enemyPage.AddElement(parent => 
+                    enemyPage.AddElement(enemyPageParent => 
                         MenuAPI.CreateREPOButton("Enable All",
                             () =>
                             {
@@ -66,15 +64,15 @@ namespace SpawnManager.Managers
                                         
                                         // Reopen page to refresh
                                         _currentPageButton = null;
-                                        button.button.onClick.Invoke();
+                                        button.onClick.Invoke();
                                     });
                             },
-                            parent,
+                            enemyPageParent,
                             new Vector2(367f, 20f)
                         )
                     );
 
-                    enemyPage.AddElement(parent => 
+                    enemyPage.AddElement(enemyPageParent => 
                         MenuAPI.CreateREPOButton("Disable All",
                             () =>
                             {
@@ -87,9 +85,9 @@ namespace SpawnManager.Managers
                                         
                                         // Reopen page to refresh
                                         _currentPageButton = null;
-                                        button.button.onClick.Invoke();
+                                        button.onClick.Invoke();
                                     });
-                            }, parent, new Vector2(536f, 20f)
+                            }, enemyPageParent, new Vector2(536f, 20f)
                         )
                     );
 
@@ -101,17 +99,17 @@ namespace SpawnManager.Managers
 
                     foreach (var name in enemyNames)
                     {
-                        enemyPage.AddElementToScrollView(parent =>
+                        enemyPage.AddElementToScrollView(enemyPageParent =>
                         {
                             return MenuAPI.CreateREPOToggle(name, 
                                 b => { Settings.UpdateEnemyEntry(name, b); },
-                                parent, default, "ON", "OFF",
+                                enemyPageParent, default, "ON", "OFF",
                                 Settings.IsEnemyEnabled(name)).rectTransform;
                         });
                     }
 
                     enemyPage.OpenPage(true);
-                });
+                };
                 
                 return button.rectTransform;
             });
@@ -123,7 +121,7 @@ namespace SpawnManager.Managers
             {
                 var button = MenuAPI.CreateREPOButton("Valuables", null, parent, new Vector2(0f, -80f + 1 * -34f));
                 
-                button.button.onClick.AddListener(() =>
+                button.onClick = () =>
                 {
                     if (_currentPageButton == button)
                         return;
@@ -133,7 +131,7 @@ namespace SpawnManager.Managers
                     var valuablePage =
                         MenuAPI.CreateREPOPopupPage("Valuables", REPOPopupPage.PresetSide.Right, false, false);
 
-                    valuablePage.AddElement(parent => 
+                    valuablePage.AddElement(valuablePageParent => 
                         MenuAPI.CreateREPOButton("Enable All",
                             () =>
                             {
@@ -145,16 +143,16 @@ namespace SpawnManager.Managers
 
                                         // Reopen page to refresh
                                         _currentPageButton = null;
-                                        button.button.onClick.Invoke();
+                                        button.onClick.Invoke();
                                     }
                                 );
                             },
-                            parent,
+                            valuablePageParent,
                             new Vector2(367f, 20f)
                         )
                     );
                     
-                    valuablePage.AddElement(parent => 
+                    valuablePage.AddElement(valuablePageParent => 
                         MenuAPI.CreateREPOButton("Disable All",
                             () =>
                             {
@@ -167,9 +165,9 @@ namespace SpawnManager.Managers
                                         
                                         // Reopen page to refresh
                                         _currentPageButton = null;
-                                        button.button.onClick.Invoke();
+                                        button.onClick.Invoke();
                                     });
-                            }, parent, new Vector2(536f, 20f)
+                            }, valuablePageParent, new Vector2(536f, 20f)
                         )
                     );
                     ValuableManager.RefreshAllValuables();
@@ -179,17 +177,17 @@ namespace SpawnManager.Managers
         
                     foreach (var valuableObject in valuablesList)
                     {
-                        valuablePage.AddElementToScrollView(parent =>
+                        valuablePage.AddElementToScrollView(valuablePageParent =>
                         {
                             return MenuAPI.CreateREPOToggle(valuableObject.FriendlyName(),
                                 b => { Settings.UpdateValuableEntry(valuableObject.name, b); },
-                                parent, default, "ON", "OFF",
+                                valuablePageParent, default, "ON", "OFF",
                                 Settings.IsValuableEnabled(valuableObject.name)).rectTransform;
                         });
                     }
         
                     valuablePage.OpenPage(true);
-                });
+                };
                 
                 return button.rectTransform;
             });

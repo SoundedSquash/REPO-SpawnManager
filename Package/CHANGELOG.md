@@ -1,3 +1,6 @@
+## 0.1.5
+- Updated to support MenuLib 2.1.1. This fixes the issue where on/off would not show the correct values.
+
 ## 0.1.4
 - Fixed error while loading level in a multiplayer lobby.
 
