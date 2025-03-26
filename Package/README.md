@@ -8,10 +8,12 @@ If you are not the host, this mod is ignored.
 ### Features
 * [Enemies](https://repo-2025horror.fandom.com/wiki/Monsters)
 * [Valuables](https://repo-2025horror.fandom.com/wiki/Valuables)
+* [Levels](https://repo-2025horror.fandom.com/wiki/Locations)
 * Including custom assets!
 
 ### Known Issues
 * After starting a game, you can no longer find and re-enable valuables in the list. Restart the game to change valuables.
+* Level never starts when you disable all levels.
 * Level never starts when you disable all generic and custom valuables.
   * Please enable at least one global valuable until this is resolved.
     * See Valuables link above. Make sure the Details doesn't say it is exclusive to a level.
