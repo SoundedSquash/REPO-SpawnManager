@@ -13,6 +13,10 @@
         {
             return level.name;
         }
+        public static string FriendlyName(this Level level)
+        {
+            return level.name.Replace("Level - ", "");
+        }
         
         // LevelValuables
         public static string GetKey(this LevelValuables levelValuables)

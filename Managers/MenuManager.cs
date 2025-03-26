@@ -33,6 +33,7 @@ namespace SpawnManager.Managers
             
             CreateEnemyPage(menu);
             CreateValuablePage(menu);
+            CreateLevelPage(menu);
 
             return menu;
         }
@@ -51,7 +52,7 @@ namespace SpawnManager.Managers
                     MenuAPI.CloseAllPagesAddedOnTop();
 
                     var enemyPage =
-                        MenuAPI.CreateREPOPopupPage("Enemies", REPOPopupPage.PresetSide.Right, false, false);
+                        MenuAPI.CreateREPOPopupPage("Enemies", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
 
                     enemyPage.AddElement(enemyPageParent => 
                         MenuAPI.CreateREPOButton("Enable All",
@@ -102,9 +103,9 @@ namespace SpawnManager.Managers
                         enemyPage.AddElementToScrollView(enemyPageParent =>
                         {
                             return MenuAPI.CreateREPOToggle(name, 
-                                b => { Settings.UpdateEnemyEntry(name, b); },
+                                b => { Settings.UpdateSettingsListEntry(Settings.DisabledEnemies, name, b); },
                                 enemyPageParent, default, "ON", "OFF",
-                                Settings.IsEnemyEnabled(name)).rectTransform;
+                                Settings.IsSettingsListEntryEnabled(Settings.DisabledEnemies, name)).rectTransform;
                         });
                     }
 
@@ -129,7 +130,7 @@ namespace SpawnManager.Managers
                     MenuAPI.CloseAllPagesAddedOnTop();
                     
                     var valuablePage =
-                        MenuAPI.CreateREPOPopupPage("Valuables", REPOPopupPage.PresetSide.Right, false, false);
+                        MenuAPI.CreateREPOPopupPage("Valuables", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
 
                     valuablePage.AddElement(valuablePageParent => 
                         MenuAPI.CreateREPOButton("Enable All",
@@ -180,13 +181,89 @@ namespace SpawnManager.Managers
                         valuablePage.AddElementToScrollView(valuablePageParent =>
                         {
                             return MenuAPI.CreateREPOToggle(valuableObject.FriendlyName(),
-                                b => { Settings.UpdateValuableEntry(valuableObject.name, b); },
+                                b => { Settings.UpdateSettingsListEntry(Settings.DisabledValuables, valuableObject.name, b); },
                                 valuablePageParent, default, "ON", "OFF",
-                                Settings.IsValuableEnabled(valuableObject.name)).rectTransform;
+                                Settings.IsSettingsListEntryEnabled(Settings.DisabledValuables, valuableObject.name)).rectTransform;
                         });
                     }
         
                     valuablePage.OpenPage(true);
+                };
+                
+                return button.rectTransform;
+            });
+        }
+
+        private static void CreateLevelPage(REPOPopupPage menu)
+        {
+            menu.AddElementToScrollView(parent =>
+            {
+                var button = MenuAPI.CreateREPOButton("Levels", null, parent, new Vector2(0f, -80f + 1 * -34f));
+                
+                button.onClick = () =>
+                {
+                    if (_currentPageButton == button)
+                        return;
+
+                    MenuAPI.CloseAllPagesAddedOnTop();
+                    
+                    var levelPage =
+                        MenuAPI.CreateREPOPopupPage("Levels", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
+
+                    levelPage.AddElement(levelPageParent => 
+                        MenuAPI.CreateREPOButton("Enable All",
+                            () =>
+                            {
+                                MenuAPI.OpenPopup($"Enable All", Color.red,
+                                    $"Enable all Levels?",
+                                    () =>
+                                    {
+                                        Settings.DisabledLevels.BoxedValue = Settings.DisabledLevels.DefaultValue;
+
+                                        // Reopen page to refresh
+                                        _currentPageButton = null;
+                                        button.onClick.Invoke();
+                                    }
+                                );
+                            },
+                            levelPageParent,
+                            new Vector2(367f, 20f)
+                        )
+                    );
+                    
+                    levelPage.AddElement(levelPageParent => 
+                        MenuAPI.CreateREPOButton("Disable All",
+                            () =>
+                            {
+                                MenuAPI.OpenPopup($"Disable All", Color.red,
+                                    $"Disable all Levels?",
+                                    () =>
+                                    {
+                                        Settings.DisabledLevels.Value = string.Join(',',
+                                            LevelManager.GetAllLevels().Select(l => l.name));
+                                        
+                                        // Reopen page to refresh
+                                        _currentPageButton = null;
+                                        button.onClick.Invoke();
+                                    });
+                            }, levelPageParent, new Vector2(536f, 20f)
+                        )
+                    );
+                    
+                    var levelsList = LevelManager.GetAllLevels().OrderBy(vo => vo.name);
+        
+                    foreach (var level in levelsList)
+                    {
+                        levelPage.AddElementToScrollView(levelPageParent =>
+                        {
+                            return MenuAPI.CreateREPOToggle(level.FriendlyName(),
+                                b => { Settings.UpdateSettingsListEntry(Settings.DisabledLevels, level.name, b); },
+                                levelPageParent, default, "ON", "OFF",
+                                Settings.IsSettingsListEntryEnabled(Settings.DisabledLevels, level.name)).rectTransform;
+                        });
+                    }
+        
+                    levelPage.OpenPage(true);
                 };
                 
                 return button.rectTransform;
