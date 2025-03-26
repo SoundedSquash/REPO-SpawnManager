@@ -26,6 +26,7 @@ namespace SpawnManager.Managers
                 RunManager.instance.levels.Remove(level);
             });
             
+            // TODO Fix this to actually return to main menu. Or prevent leaving settings page so this can't happen.
             if (RunManager.instance.levels.Count == 0)
             {
                 Settings.Logger.LogError("No levels left in RunManager. Quitting to Main Menu.");
