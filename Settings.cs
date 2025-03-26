@@ -10,6 +10,8 @@ namespace SpawnManager
         
         public static ConfigEntry<string> DisabledValuables { get; set; }
         
+        public static ConfigEntry<string> DisabledLevels { get; set; }
+        
         public static ManualLogSource Logger { get; private set; }
 
         internal static void Initialize(ConfigFile config, ManualLogSource logger)
@@ -27,11 +29,17 @@ namespace SpawnManager
                 "DisabledList",
                 "",
                 "Comma-separated list of valuable names to disable. (e.g. \"Valuable Television,Valuable Diamond Display\")");
+            
+            DisabledLevels = config.Bind(
+                "Levels",
+                "DisabledList",
+                "",
+                "Comma-separated list of level names to disable. (e.g. \"Level - Manor\")");
         }
         
-        public static List<string> GetDisabledEnemyNames()
+        public static List<string> GetDisabledSettingsEntryListNames(ConfigEntry<string> settingsVariable)
         {
-            return ConvertStringToList(DisabledEnemies.Value);
+            return ConvertStringToList(settingsVariable.Value);
         }
         
         private static List<string> ConvertStringToList(string str)
@@ -41,65 +49,27 @@ namespace SpawnManager
             return new List<string>(str.Split(',', System.StringSplitOptions.RemoveEmptyEntries));
         }
 
-        public static void UpdateEnemyEntry(string enemyName, bool enabled)
+        public static void UpdateSettingsListEntry(ConfigEntry<string> settingsVariable, string entry, bool enabled)
         {
-            var currentList = GetDisabledEnemyNames();
+            var currentList = GetDisabledSettingsEntryListNames(settingsVariable);
             
             if (enabled)
             {
-                currentList.Remove(enemyName);
+                currentList.Remove(entry);
             }
             else
             {
-                if (!currentList.Contains(enemyName))
-                    currentList.Add(enemyName);
+                if (!currentList.Contains(entry))
+                    currentList.Add(entry);
             }
             
-            SaveEnemyList(currentList);
+            settingsVariable.Value = string.Join(",", currentList);
         }
 
-        public static void SaveEnemyList(List<string> enemyNames)
+        public static bool IsSettingsListEntryEnabled(ConfigEntry<string> settingsVariable, string entry)
         {
-            DisabledEnemies.Value = string.Join(",", enemyNames);
-        }
-
-        public static bool IsEnemyEnabled(string enemyName)
-        {
-            var disabledEnemies = GetDisabledEnemyNames();
-            return !disabledEnemies.Contains(enemyName);
-        }
-        
-        public static List<string> GetDisabledValuableNames()
-        {
-            return ConvertStringToList(DisabledValuables.Value);
-        }
-
-        public static void UpdateValuableEntry(string valuableName, bool enabled)
-        {
-            var currentList = GetDisabledValuableNames();
-            
-            if (enabled)
-            {
-                currentList.Remove(valuableName);
-            }
-            else
-            {
-                if (!currentList.Contains(valuableName))
-                    currentList.Add(valuableName);
-            }
-            
-            SaveValuableList(currentList);
-        }
-
-        public static void SaveValuableList(List<string> valuableNames)
-        {
-            DisabledValuables.Value = string.Join(",", valuableNames);
-        }
-
-        public static bool IsValuableEnabled(string valuableName)
-        {
-            var disabledValuables = GetDisabledValuableNames();
-            return !disabledValuables.Contains(valuableName);
+            var disabledEntries = GetDisabledSettingsEntryListNames(settingsVariable);
+            return !disabledEntries.Contains(entry);
         }
     }
 }

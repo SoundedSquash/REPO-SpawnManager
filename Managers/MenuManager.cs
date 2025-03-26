@@ -102,9 +102,9 @@ namespace SpawnManager.Managers
                         enemyPage.AddElementToScrollView(enemyPageParent =>
                         {
                             return MenuAPI.CreateREPOToggle(name, 
-                                b => { Settings.UpdateEnemyEntry(name, b); },
+                                b => { Settings.UpdateSettingsListEntry(Settings.DisabledEnemies, name, b); },
                                 enemyPageParent, default, "ON", "OFF",
-                                Settings.IsEnemyEnabled(name)).rectTransform;
+                                Settings.IsSettingsListEntryEnabled(Settings.DisabledEnemies, name)).rectTransform;
                         });
                     }
 
@@ -180,9 +180,9 @@ namespace SpawnManager.Managers
                         valuablePage.AddElementToScrollView(valuablePageParent =>
                         {
                             return MenuAPI.CreateREPOToggle(valuableObject.FriendlyName(),
-                                b => { Settings.UpdateValuableEntry(valuableObject.name, b); },
+                                b => { Settings.UpdateSettingsListEntry(Settings.DisabledValuables, valuableObject.name, b); },
                                 valuablePageParent, default, "ON", "OFF",
-                                Settings.IsValuableEnabled(valuableObject.name)).rectTransform;
+                                Settings.IsSettingsListEntryEnabled(Settings.DisabledValuables, valuableObject.name)).rectTransform;
                         });
                     }
         
