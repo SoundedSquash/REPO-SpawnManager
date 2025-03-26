@@ -1,18 +1,19 @@
 ﻿using System.Collections.Generic;
 using BepInEx.Configuration;
 using BepInEx.Logging;
+using SpawnManager.Managers;
 
 namespace SpawnManager
 {
     public static class Settings
     {
-        public static ConfigEntry<string> DisabledEnemies { get; set; }
-        
-        public static ConfigEntry<string> DisabledValuables { get; set; }
-        
-        public static ConfigEntry<string> DisabledLevels { get; set; }
-        
-        public static ManualLogSource Logger { get; private set; }
+        public static ConfigEntry<string> DisabledEnemies { get; private set; } = null!;
+
+        public static ConfigEntry<string> DisabledValuables { get; private set; } = null!;
+
+        public static ConfigEntry<string> DisabledLevels { get; private set; } = null!;
+
+        public static ManualLogSource Logger { get; private set; } = null!;
 
         internal static void Initialize(ConfigFile config, ManualLogSource logger)
         {
@@ -56,6 +57,16 @@ namespace SpawnManager
             if (enabled)
             {
                 currentList.Remove(entry);
+                
+                // Restore game objects if they are now enabled.
+                if (settingsVariable == DisabledValuables)
+                {
+                    ValuableManager.RestoreValuableObjects();
+                }
+                else if (settingsVariable == DisabledLevels)
+                {
+                    LevelManager.RestoreLevels();
+                }
             }
             else
             {

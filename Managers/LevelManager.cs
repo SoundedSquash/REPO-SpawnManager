@@ -9,6 +9,10 @@ namespace SpawnManager.Managers
     {
         private static List<Level> _removedList = new List<Level>();
 
+        private static bool RunManagerLevelVariableIsAvailable => RunManager.instance != null && RunManager.instance.levels != null;
+
+        public static IEnumerable<Level> GetAllLevels() => _removedList.Concat(RunManager.instance.levels);
+
         public static void RemoveLevels()
         {
             if (!RunManagerLevelVariableIsAvailable) return;
@@ -32,15 +36,15 @@ namespace SpawnManager.Managers
         public static void RestoreLevels()
         {
             if (!RunManagerLevelVariableIsAvailable) return;
-            
-            _removedList.ForEach(level =>
+            if (_removedList.Count == 0) return;
+
+            for (var i = _removedList.Count - 1; i >= 0; i--)
             {
+                var level = _removedList[i];
                 Settings.Logger.LogDebug($"Restored level {level.name}.");
                 RunManager.instance.levels.Add(level);
-                _removedList.Remove(level);
-            });
+                _removedList.RemoveAt(i);
+            }
         }
-
-        private static bool RunManagerLevelVariableIsAvailable => RunManager.instance != null && RunManager.instance.levels != null;
     }
 }
