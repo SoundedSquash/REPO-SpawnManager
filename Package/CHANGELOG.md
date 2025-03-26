@@ -1,3 +1,6 @@
+## 0.2.2
+- Bump MenuLib version to 2.1.3.
+
 ## 0.2.0
 - Added level manager to enable/disable levels.
 
