@@ -1,3 +1,6 @@
+## 0.3.1
+- Prevent leaving the menu if level selection is invalid.
+
 ## 0.3.0
 - Valuables can be changed without restarting.
 - The chance of spawning large items in small spots is greatly reduced.
