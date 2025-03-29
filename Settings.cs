@@ -12,6 +12,8 @@ namespace SpawnManager
         public static ConfigEntry<string> DisabledValuables { get; private set; } = null!;
 
         public static ConfigEntry<string> DisabledLevels { get; private set; } = null!;
+        
+        public static ConfigEntry<string> DefaultValuable { get; private set; } = null!;
 
         public static ManualLogSource Logger { get; private set; } = null!;
 
@@ -24,6 +26,12 @@ namespace SpawnManager
                 "DisabledList",
                 "",
                 "Comma-separated list of enemy names to disable. (e.g. \"Apex Predator,Headman\")");
+            
+            DefaultValuable = config.Bind(
+                "Valuables",
+                "Default",
+                "Valuable Goblet",
+                "A single tiny valuable used to fill when there aren't enough valuables enabled in the level. (e.g. \"Valuable Diamond\")");
             
             DisabledValuables = config.Bind(
                 "Valuables",
@@ -57,16 +65,6 @@ namespace SpawnManager
             if (enabled)
             {
                 currentList.Remove(entry);
-                
-                // Restore game objects if they are now enabled.
-                if (settingsVariable == DisabledValuables)
-                {
-                    ValuableManager.RestoreValuableObjects();
-                }
-                else if (settingsVariable == DisabledLevels)
-                {
-                    LevelManager.RestoreLevels();
-                }
             }
             else
             {

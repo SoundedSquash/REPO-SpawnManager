@@ -5,12 +5,12 @@ using SpawnManager.Managers;
 
 namespace SpawnManager
 {
-    [BepInPlugin(PluginGuid, PluginName, PluginVersion)]
+    [BepInPlugin(PluginGuid, PluginName, PluginVersion), BepInDependency("nickklmao.menulib")]
     public class MuteToggleBase : BaseUnityPlugin
     {
         private const string PluginGuid = "soundedsquash.spawnmanager";
         private const string PluginName = "Enemy/Valuable Spawn Manager";
-        private const string PluginVersion = "0.2.2.0";
+        private const string PluginVersion = "0.3.0.0";
         
         private readonly Harmony _harmony = new Harmony(PluginGuid);
 

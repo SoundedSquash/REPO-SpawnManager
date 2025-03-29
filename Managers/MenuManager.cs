@@ -31,6 +31,9 @@ namespace SpawnManager.Managers
                 new Vector2(77f, 34f))
             );
             
+            LevelManager.RestoreLevels();
+            ValuableManager.RestoreValuableObjects();
+            
             CreateEnemyPage(menu);
             CreateValuablePage(menu);
             CreateLevelPage(menu);
@@ -173,6 +176,23 @@ namespace SpawnManager.Managers
                     );
                     ValuableManager.RefreshAllValuables();
                     Settings.Logger.LogDebug($"Refreshed {ValuableManager.ValuableList.Count} valuable names for menu.");
+
+                    var tinyItems = ValuableManager.AllItems
+                        .Where(ai => ai.Value.PresetType == ValuableManager.ValuablePresetType.Tiny)
+                        .Select(i => i.Key);
+                    
+                    valuablePage.AddElementToScrollView(valuablePageParent =>
+                    {
+                        return MenuAPI.CreateREPOSlider("Default Valuable",
+                            "This is used when not enough valuables are enabled for certain sizes. Only tiny items are allowed.",
+                            onOptionChanged: stringValue =>
+                            {
+                                Settings.DefaultValuable.Value = stringValue;
+                            },
+                            valuablePageParent,
+                            tinyItems.ToArray(),
+                            defaultOption: Settings.DefaultValuable.Value).rectTransform;
+                    });
                     
                     var valuablesList = ValuableManager.ValuableList.OrderBy(vo => vo.name);
         

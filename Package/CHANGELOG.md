@@ -1,3 +1,9 @@
+## 0.3.0
+- Valuables can be changed without restarting.
+- The chance of spawning large items in small spots is greatly reduced.
+  - Added a configurable default valuable. Only seen if not enough valuables are enabled.
+- Various bug fixes.
+
 ## 0.2.2
 - Bump MenuLib version to 2.1.3.
 

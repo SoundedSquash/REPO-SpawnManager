@@ -23,5 +23,10 @@
         {
             return levelValuables.name;
         }
+
+        public static bool IsGenericList(this LevelValuables levelValuables)
+        {
+            return levelValuables.name.Contains("Generic");
+        }
     }
 }

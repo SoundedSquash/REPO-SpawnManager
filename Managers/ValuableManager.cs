@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using SpawnManager.Extensions;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -22,13 +23,13 @@ namespace SpawnManager.Managers
                     {
                         foreach (var valuablePreset in level.ValuablePresets)
                         {
-                            AddItemsToDictionary(valuablePreset.tiny, level.name, ValuablePresetType.Tiny);
-                            AddItemsToDictionary(valuablePreset.small, level.name, ValuablePresetType.Small);
-                            AddItemsToDictionary(valuablePreset.medium, level.name, ValuablePresetType.Medium);
-                            AddItemsToDictionary(valuablePreset.big, level.name, ValuablePresetType.Big);
-                            AddItemsToDictionary(valuablePreset.wide, level.name, ValuablePresetType.Wide);
-                            AddItemsToDictionary(valuablePreset.tall, level.name, ValuablePresetType.Tall);
-                            AddItemsToDictionary(valuablePreset.veryTall, level.name, ValuablePresetType.VeryTall);
+                            AddItemsToDictionary(valuablePreset.tiny, valuablePreset.name, ValuablePresetType.Tiny);
+                            AddItemsToDictionary(valuablePreset.small, valuablePreset.name, ValuablePresetType.Small);
+                            AddItemsToDictionary(valuablePreset.medium, valuablePreset.name, ValuablePresetType.Medium);
+                            AddItemsToDictionary(valuablePreset.big, valuablePreset.name, ValuablePresetType.Big);
+                            AddItemsToDictionary(valuablePreset.wide, valuablePreset.name, ValuablePresetType.Wide);
+                            AddItemsToDictionary(valuablePreset.tall, valuablePreset.name, ValuablePresetType.Tall);
+                            AddItemsToDictionary(valuablePreset.veryTall, valuablePreset.name, ValuablePresetType.VeryTall);
                         }
                     }
                 }
@@ -70,9 +71,13 @@ namespace SpawnManager.Managers
         private static void RemoveValuableObjects(List<ValuableObject> valuableObjectsToRemove)
         {
             if (RunManager.instance == null || RunManager.instance.levels == null) return;
-            
+
+            bool isGenericProcessed = false;
             foreach (var valuablePreset in RunManager.instance.levels.SelectMany(level => level.ValuablePresets))
             {
+                // Only need to process the generic list once.
+                if (valuablePreset.IsGenericList() && isGenericProcessed) continue;
+                
                 RemoveValuableObjectsFromList(valuablePreset.tiny, valuableObjectsToRemove);
                 RemoveValuableObjectsFromList(valuablePreset.small, valuableObjectsToRemove);
                 RemoveValuableObjectsFromList(valuablePreset.medium, valuableObjectsToRemove);
@@ -81,23 +86,31 @@ namespace SpawnManager.Managers
                 RemoveValuableObjectsFromList(valuablePreset.tall, valuableObjectsToRemove);
                 RemoveValuableObjectsFromList(valuablePreset.veryTall, valuableObjectsToRemove);
                 
-                var allItems = valuablePreset.tiny.Concat(valuablePreset.small)
-                    .Concat(valuablePreset.medium)
-                    .Concat(valuablePreset.big)
-                    .Concat(valuablePreset.wide)
-                    .Concat(valuablePreset.tall)
-                    .Concat(valuablePreset.veryTall)
-                    .ToList();
+                // Only fill for the generic list.
+                if (!valuablePreset.IsGenericList()) continue;
                 
-                if (allItems.Count == 0) continue;
+                if (!valuablePreset.tiny.Any())
+                {
+                    valuablePreset.tiny.Add(AllItems.First(i => i.Key == Settings.DefaultValuable.Value).Value.ValuableGameObject);
+                }
+                var smallerItems = valuablePreset.tiny.ToList();
                 
-                if (!valuablePreset.tiny.Any()) valuablePreset.tiny.Add(allItems[Random.Range(0, allItems.Count)]);
-                if (!valuablePreset.small.Any()) valuablePreset.small.Add(allItems[Random.Range(0, allItems.Count)]);
-                if (!valuablePreset.medium.Any()) valuablePreset.medium.Add(allItems[Random.Range(0, allItems.Count)]);
-                if (!valuablePreset.big.Any()) valuablePreset.big.Add(allItems[Random.Range(0, allItems.Count)]);
-                if (!valuablePreset.wide.Any()) valuablePreset.wide.Add(allItems[Random.Range(0, allItems.Count)]);
-                if (!valuablePreset.tall.Any()) valuablePreset.tall.Add(allItems[Random.Range(0, allItems.Count)]);
-                if (!valuablePreset.veryTall.Any()) valuablePreset.veryTall.Add(allItems[Random.Range(0, allItems.Count)]);
+                if (!valuablePreset.small.Any()) valuablePreset.small.Add(smallerItems[Random.Range(0, smallerItems.Count)]);
+                smallerItems = smallerItems.Concat(valuablePreset.small).ToList();
+                
+                if (!valuablePreset.medium.Any()) valuablePreset.medium.Add(smallerItems[Random.Range(0, smallerItems.Count)]);
+                smallerItems = smallerItems.Concat(valuablePreset.medium).ToList();
+                
+                if (!valuablePreset.big.Any()) valuablePreset.big.Add(smallerItems[Random.Range(0, smallerItems.Count)]);
+                smallerItems = smallerItems.Concat(valuablePreset.big).ToList();
+                
+                if (!valuablePreset.wide.Any()) valuablePreset.wide.Add(smallerItems[Random.Range(0, smallerItems.Count)]);
+                smallerItems = smallerItems.Concat(valuablePreset.wide).ToList();
+                
+                if (!valuablePreset.tall.Any()) valuablePreset.tall.Add(smallerItems[Random.Range(0, smallerItems.Count)]);
+                smallerItems = smallerItems.Concat(valuablePreset.tall).ToList();
+                
+                if (!valuablePreset.veryTall.Any()) valuablePreset.veryTall.Add(smallerItems[Random.Range(0, smallerItems.Count)]);
             }
         }
 
@@ -118,23 +131,41 @@ namespace SpawnManager.Managers
         
         public static void RestoreValuableObjects()
         {
-            // TODO
-            return;
-            if (RemovedList.Count == 0) return;
+            Settings.Logger.LogDebug($"All items [{AllItems.Count}]");
+            if (AllItems.Count == 0) return;
+            Settings.Logger.LogDebug($"Run manager levels [{RunManager.instance?.levels.Count}]");
             if (RunManager.instance == null || RunManager.instance.levels == null) return;
             
-            foreach (var level in RunManager.instance.levels.Select(level => new { 
-                         Level = level,
-                         ValuablePresets = level.ValuablePresets }))
+            foreach (var level in RunManager.instance.levels)
             {
-                // RemoveValuableObjectsFromList(valuablePreset.tiny, valuableObjectsToRemove);
-                // RemoveValuableObjectsFromList(valuablePreset.small, valuableObjectsToRemove);
-                // RemoveValuableObjectsFromList(valuablePreset.medium, valuableObjectsToRemove);
-                // RemoveValuableObjectsFromList(valuablePreset.big, valuableObjectsToRemove);
-                // RemoveValuableObjectsFromList(valuablePreset.wide, valuableObjectsToRemove);
-                // RemoveValuableObjectsFromList(valuablePreset.tall, valuableObjectsToRemove);
-                // RemoveValuableObjectsFromList(valuablePreset.veryTall, valuableObjectsToRemove);
+                foreach (var valuablePreset in level.ValuablePresets)
+                {
+                    RestoreValuableObjectsFromList(valuablePreset.tiny, valuablePreset.name, ValuablePresetType.Tiny);
+                    RestoreValuableObjectsFromList(valuablePreset.small, valuablePreset.name, ValuablePresetType.Small);
+                    RestoreValuableObjectsFromList(valuablePreset.medium, valuablePreset.name, ValuablePresetType.Medium);
+                    RestoreValuableObjectsFromList(valuablePreset.big, valuablePreset.name, ValuablePresetType.Big);
+                    RestoreValuableObjectsFromList(valuablePreset.wide, valuablePreset.name, ValuablePresetType.Wide);
+                    RestoreValuableObjectsFromList(valuablePreset.tall, valuablePreset.name, ValuablePresetType.Tall);
+                    RestoreValuableObjectsFromList(valuablePreset.veryTall, valuablePreset.name, ValuablePresetType.VeryTall);
+                }
             }
+        }
+
+        private static void RestoreValuableObjectsFromList(List<GameObject> list, string valuablePresetName, ValuablePresetType type)
+        {
+            var restoredValuables = new List<string>();
+            foreach (var obj in AllItems.Values.Where(
+                         meta => meta.PresetType == type 
+                                 && meta.ValuablePresetName == valuablePresetName
+                                 && !list.Contains(meta.ValuableGameObject)))
+            {
+                restoredValuables.Add(obj.ValuableGameObject.name);
+                list.Add(obj.ValuableGameObject);
+            }
+            
+            // Don't log if nothing was restored.
+            if (restoredValuables.Count ==0) return;
+            Settings.Logger.LogDebug($"Restored valuables for {valuablePresetName}:{type} ({string.Join(", ", restoredValuables)})");
         }
         
         public enum ValuablePresetType
@@ -190,13 +221,13 @@ namespace SpawnManager.Managers
 
         public static Dictionary<string, ValuableMetaData> AllItems = new Dictionary<string, ValuableMetaData>();
 
-        static void AddItemsToDictionary(List<GameObject> list, string levelName, ValuablePresetType type)
+        static void AddItemsToDictionary(List<GameObject> list, string valuablePresetName, ValuablePresetType type)
         {
             foreach (var item in list)
             {
                 if (item != null)
                 {
-                    AllItems.TryAdd(item.name, new ValuableMetaData(levelName, type));
+                    AllItems.TryAdd(item.name, new ValuableMetaData(item, valuablePresetName, type));
                 }
             }
         }
@@ -204,13 +235,15 @@ namespace SpawnManager.Managers
     
     public class ValuableMetaData
     {
-        public ValuableMetaData(string levelName, ValuableManager.ValuablePresetType presetType)
+        public ValuableMetaData(GameObject valuable, string valuablePresetName, ValuableManager.ValuablePresetType presetType)
         {
-            LevelName = levelName;
+            ValuableGameObject = valuable;
+            ValuablePresetName = valuablePresetName;
             PresetType = presetType;
         }
 
-        public string LevelName { get; set; }
+        public GameObject ValuableGameObject { get; set; }
+        public string ValuablePresetName { get; set; }
         public ValuableManager.ValuablePresetType PresetType { get; set; }
     }
 }
