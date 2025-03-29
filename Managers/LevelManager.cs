@@ -47,5 +47,14 @@ namespace SpawnManager.Managers
                 _removedList.RemoveAt(i);
             }
         }
+
+        /// <summary>
+        /// Check if the Disabled Levels list is valid. At least one level must be available.
+        /// </summary>
+        public static bool IsValid()
+        {
+            // Valid if at least one level is not removed.
+            return RunManager.instance.levels.Any(l => !Settings.GetDisabledSettingsEntryListNames(Settings.DisabledLevels).Contains(l.name));
+        } 
     }
 }

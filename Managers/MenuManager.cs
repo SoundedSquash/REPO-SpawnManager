@@ -24,19 +24,34 @@ namespace SpawnManager.Managers
         private static REPOPopupPage CreatePopup()
         {
             var menu = MenuAPI.CreateREPOPopupPage("Spawn Manager", REPOPopupPage.PresetSide.Left, false, true);
-            menu.AddElement(parent => 
-                MenuAPI.CreateREPOButton("Back", 
-                () => menu.ClosePage(true),
-                parent,
-                new Vector2(77f, 34f))
-            );
             
             LevelManager.RestoreLevels();
             ValuableManager.RestoreValuableObjects();
             
             CreateEnemyPage(menu);
             CreateValuablePage(menu);
-            CreateLevelPage(menu);
+            CreateLevelPage(menu, out var levelButton);
+            
+            menu.AddElement(parent => 
+                MenuAPI.CreateREPOButton("Back", 
+                    () =>
+                    {
+                        if (!LevelManager.IsValid())
+                        {
+                            MenuAPI.OpenPopup("Invalid Levels", Color.red,
+                                "Please make sure you have at least one level enabled. Would you like to edit the selections now?",
+                                () =>
+                                {
+                                    levelButton.onClick.Invoke();
+                                });
+                            return;
+                        }
+                    
+                        menu.ClosePage(true);
+                    },
+                    parent,
+                    new Vector2(77f, 34f))
+            );
 
             return menu;
         }
@@ -214,8 +229,9 @@ namespace SpawnManager.Managers
             });
         }
 
-        private static void CreateLevelPage(REPOPopupPage menu)
+        private static void CreateLevelPage(REPOPopupPage menu, out REPOButton levelButton)
         {
+            REPOButton localButton = null!;
             menu.AddElementToScrollView(parent =>
             {
                 var button = MenuAPI.CreateREPOButton("Levels", null, parent, new Vector2(0f, -80f + 1 * -34f));
@@ -286,8 +302,11 @@ namespace SpawnManager.Managers
                     levelPage.OpenPage(true);
                 };
                 
+                localButton = button;
                 return button.rectTransform;
             });
+            
+            levelButton = localButton;
         }
     }
 }
