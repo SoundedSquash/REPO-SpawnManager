@@ -16,34 +16,42 @@ namespace SpawnManager
         public static ConfigEntry<string> DefaultValuable { get; private set; } = null!;
 
         public static ManualLogSource Logger { get; private set; } = null!;
+        
+        private const string HideFromRepoConfig = "HideREPOConfig";
 
         internal static void Initialize(ConfigFile config, ManualLogSource logger)
         {
             Logger = logger;
             
+            _ = config.Bind(
+                "Do Not Use",
+                "Use Spawn Manager button on main menu",
+                0f,
+                "Use Spawn Manager button on main menu");
+            
             DisabledEnemies = config.Bind(
                 "Enemies",
                 "DisabledList",
                 "",
-                "Comma-separated list of enemy names to disable. (e.g. \"Apex Predator,Headman\")");
+                new ConfigDescription("Comma-separated list of enemy names to disable. (e.g. \"Apex Predator,Headman\")", null, HideFromRepoConfig));
             
             DefaultValuable = config.Bind(
                 "Valuables",
                 "Default",
                 "Valuable Goblet",
-                "A single tiny valuable used to fill when there aren't enough valuables enabled in the level. (e.g. \"Valuable Diamond\")");
+                new ConfigDescription("A single tiny valuable used to fill when there aren't enough valuables enabled in the level. (e.g. \"Valuable Diamond\")", null, HideFromRepoConfig));
             
             DisabledValuables = config.Bind(
                 "Valuables",
                 "DisabledList",
                 "",
-                "Comma-separated list of valuable names to disable. (e.g. \"Valuable Television,Valuable Diamond Display\")");
+                new ConfigDescription("Comma-separated list of valuable names to disable. (e.g. \"Valuable Television,Valuable Diamond Display\")", null, HideFromRepoConfig));
             
             DisabledLevels = config.Bind(
                 "Levels",
                 "DisabledList",
                 "",
-                "Comma-separated list of level names to disable. (e.g. \"Level - Manor\")");
+                new ConfigDescription("Comma-separated list of level names to disable. (e.g. \"Level - Manor\")", null, HideFromRepoConfig));
         }
         
         public static List<string> GetDisabledSettingsEntryListNames(ConfigEntry<string> settingsVariable)
