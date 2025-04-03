@@ -105,7 +105,9 @@ namespace SpawnManager.Managers
                 smallerItems = smallerItems.Concat(valuablePreset.big).ToList();
                 
                 if (!valuablePreset.wide.Any()) valuablePreset.wide.Add(smallerItems[Random.Range(0, smallerItems.Count)]);
-                smallerItems = smallerItems.Concat(valuablePreset.wide).ToList();
+                // Keep as big for tall/very tall to avoid potential issues with using wide objects.
+                // Open to investigation.
+                smallerItems = smallerItems.Concat(valuablePreset.big).ToList();
                 
                 if (!valuablePreset.tall.Any()) valuablePreset.tall.Add(smallerItems[Random.Range(0, smallerItems.Count)]);
                 smallerItems = smallerItems.Concat(valuablePreset.tall).ToList();
