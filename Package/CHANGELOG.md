@@ -1,3 +1,8 @@
+## 0.3.2
+- Hide configs from REPOConfig to prevent confusion.
+- Fill tall items from big instead of wide for stability.
+- Developer stability when using Unity Editor.
+
 ## 0.3.1
 - Prevent leaving the menu if level selection is invalid.
 

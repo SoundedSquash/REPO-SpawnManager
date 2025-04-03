@@ -35,13 +35,13 @@ namespace SpawnManager.Managers
                 }
 
                 ValuableList = RunManager.instance.levels.SelectMany(l => l.ValuablePresets ?? Enumerable.Empty<LevelValuables>())
-                    .SelectMany(lv => (lv?.tiny ?? Enumerable.Empty<GameObject>())
-                        .Concat(lv?.small ?? Enumerable.Empty<GameObject>())
-                        .Concat(lv?.medium ?? Enumerable.Empty<GameObject>())
-                        .Concat(lv?.big ?? Enumerable.Empty<GameObject>())
-                        .Concat(lv?.wide ?? Enumerable.Empty<GameObject>())
-                        .Concat(lv?.tall ?? Enumerable.Empty<GameObject>())
-                        .Concat(lv?.veryTall ?? Enumerable.Empty<GameObject>()))
+                    .SelectMany(lv => (lv?.tiny?.Where(go => go != null) ?? Enumerable.Empty<GameObject>())
+                        .Concat(lv?.small?.Where(go => go != null) ?? Enumerable.Empty<GameObject>())
+                        .Concat(lv?.medium?.Where(go => go != null) ?? Enumerable.Empty<GameObject>())
+                        .Concat(lv?.big?.Where(go => go != null) ?? Enumerable.Empty<GameObject>())
+                        .Concat(lv?.wide?.Where(go => go != null) ?? Enumerable.Empty<GameObject>())
+                        .Concat(lv?.tall?.Where(go => go != null) ?? Enumerable.Empty<GameObject>())
+                        .Concat(lv?.veryTall?.Where(go => go != null) ?? Enumerable.Empty<GameObject>()))
                     .Select(go => go?.GetComponent<ValuableObject>())
                     .Where(vo => vo != null)
                     .Distinct()
@@ -105,7 +105,9 @@ namespace SpawnManager.Managers
                 smallerItems = smallerItems.Concat(valuablePreset.big).ToList();
                 
                 if (!valuablePreset.wide.Any()) valuablePreset.wide.Add(smallerItems[Random.Range(0, smallerItems.Count)]);
-                smallerItems = smallerItems.Concat(valuablePreset.wide).ToList();
+                // Keep as big for tall/very tall to avoid potential issues with using wide objects.
+                // Open to investigation.
+                smallerItems = smallerItems.Concat(valuablePreset.big).ToList();
                 
                 if (!valuablePreset.tall.Any()) valuablePreset.tall.Add(smallerItems[Random.Range(0, smallerItems.Count)]);
                 smallerItems = smallerItems.Concat(valuablePreset.tall).ToList();
