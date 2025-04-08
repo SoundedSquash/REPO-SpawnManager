@@ -128,9 +128,10 @@ namespace SpawnManager.Managers
                         });
                     }
 
+                    _currentPageButton = button;
                     enemyPage.OpenPage(true);
                 };
-                
+
                 return button.rectTransform;
             });
         }
@@ -223,6 +224,7 @@ namespace SpawnManager.Managers
                         });
                     }
         
+                    _currentPageButton = button;
                     valuablePage.OpenPage(true);
                 };
                 
@@ -300,6 +302,7 @@ namespace SpawnManager.Managers
                         });
                     }
         
+                    _currentPageButton = button;
                     levelPage.OpenPage(true);
                 };
                 
