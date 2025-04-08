@@ -1,3 +1,9 @@
+## 0.3.3
+- MenuLib is now a soft dependency, meaning it's not a requirement.
+  - It is still highly recommended to keep MenuLib as the in-game Spawn Manager menu is missing without it.
+- Fixed a small performance issue with the menu.
+- Bumped MenuLib to 2.3.0.
+
 ## 0.3.2
 - Hide configs from REPOConfig to prevent confusion.
 - Fill tall items from big instead of wide for stability.
