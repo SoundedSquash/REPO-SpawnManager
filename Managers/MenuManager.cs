@@ -8,7 +8,8 @@ namespace SpawnManager.Managers
 {
     public static class MenuModManager
     {
-        private static REPOButton? _currentPageButton;
+        // Type REPOButton. Not explicitly set to support soft dependency.
+        private static object? _currentPageButton;
         
         public static void Initialize()
         {
@@ -64,7 +65,7 @@ namespace SpawnManager.Managers
 
                 button.onClick = () =>
                 {
-                    if (_currentPageButton == button)
+                    if (ReferenceEquals(_currentPageButton, button))
                         return;
 
                     MenuAPI.CloseAllPagesAddedOnTop();
@@ -142,7 +143,7 @@ namespace SpawnManager.Managers
                 
                 button.onClick = () =>
                 {
-                    if (_currentPageButton == button)
+                    if (ReferenceEquals(_currentPageButton, button))
                         return;
 
                     MenuAPI.CloseAllPagesAddedOnTop();
@@ -238,7 +239,7 @@ namespace SpawnManager.Managers
                 
                 button.onClick = () =>
                 {
-                    if (_currentPageButton == button)
+                    if (ReferenceEquals(_currentPageButton, button))
                         return;
 
                     MenuAPI.CloseAllPagesAddedOnTop();

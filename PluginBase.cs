@@ -5,7 +5,7 @@ using SpawnManager.Managers;
 
 namespace SpawnManager
 {
-    [BepInPlugin(PluginGuid, PluginName, PluginVersion), BepInDependency("nickklmao.menulib")]
+    [BepInPlugin(PluginGuid, PluginName, PluginVersion), BepInDependency(Constants.MenuLibGuid, BepInDependency.DependencyFlags.SoftDependency)]
     public class MuteToggleBase : BaseUnityPlugin
     {
         private const string PluginGuid = "soundedsquash.spawnmanager";
@@ -20,8 +20,16 @@ namespace SpawnManager
         {
             // Initialize global objects
             Settings.Initialize(Config, ManualLogSource);
-            
-            MenuModManager.Initialize();
+
+            // Initialize menu if MenuLib is installed
+            if (PluginManager.IsPluginInstalled(Constants.MenuLibGuid))
+            {
+                MenuModManager.Initialize();
+            }
+            else
+            {
+                Settings.Logger.LogWarning("MenuLib not loaded. Cannot add button to main menu.");
+            }
 
             _harmony.PatchAll();
             ManualLogSource.LogInfo($"{PluginName} loaded");
