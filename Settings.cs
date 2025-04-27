@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using BepInEx.Configuration;
 using BepInEx.Logging;
+using SpawnManager.Extensions;
 using SpawnManager.Managers;
 
 namespace SpawnManager
@@ -12,6 +13,8 @@ namespace SpawnManager
         public static ConfigEntry<string> DisabledValuables { get; private set; } = null!;
 
         public static ConfigEntry<string> DisabledLevels { get; private set; } = null!;
+
+        public static IDictionary<string, ConfigEntry<string>> DisabledLevelEnemies { get; private set; } = new Dictionary<string, ConfigEntry<string>>();
         
         public static ConfigEntry<string> DefaultValuable { get; private set; } = null!;
 
@@ -53,7 +56,30 @@ namespace SpawnManager
                 "",
                 new ConfigDescription("Comma-separated list of level names to disable. (e.g. \"Level - Manor\")", null, HideFromRepoConfig));
         }
-        
+
+        internal static void LateInitialize(ConfigFile config)
+        {
+            foreach (Level level in LevelManager.GetAllLevels())
+            {
+                ConfigEntry<string> configBinding = config.Bind(
+                "Levels",
+                $"{level.FriendlyName()} - Disabled Enemies",
+                "",
+                new ConfigDescription("Comma-separated list of enemy names to disable in this level. (e.g. \\\"Apex Predator,Headman\\\")", null, HideFromRepoConfig));
+
+                DisabledLevelEnemies.Add(level.name, configBinding);
+            }
+        }
+
+        public static ISet<string> GetDisabledEnemiesForLevel(string level)
+        {
+            if (DisabledLevelEnemies.TryGetValue(level, out ConfigEntry<string> disabledEnemies))
+            {
+                return new HashSet<string>(ConvertStringToList(disabledEnemies.Value));
+            }
+            return new HashSet<string>();
+        }
+
         public static List<string> GetDisabledSettingsEntryListNames(ConfigEntry<string> settingsVariable)
         {
             return ConvertStringToList(settingsVariable.Value);

@@ -22,7 +22,7 @@ namespace SpawnManager.Patches
             Settings.Logger.LogDebug("Not on menu level, removing enemies.");
             EnemyManager.RemoveEnemies();
         }
-        
+
         [HarmonyPatch("PickEnemies")]
         [HarmonyPostfix]
         static void EnemyDirectorPickEnemiesPostfix(ref List<EnemySetup> ___enemyList)
@@ -31,6 +31,8 @@ namespace SpawnManager.Patches
 
             // Remove all null entries from the enemy list
             ___enemyList.RemoveAll(e => e == null);
+
+            Settings.Logger.LogDebug($"Level starting with enemies: " + string.Join(", ", ___enemyList));
         }
         
         [HarmonyPatch(nameof(EnemyDirector.GetEnemy))]

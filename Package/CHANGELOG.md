@@ -1,3 +1,6 @@
+## 0.4.0
+- Added feature to disable enemy spawns on a per-level basis
+
 ## 0.3.3
 - MenuLib is now a soft dependency, meaning it's not a requirement.
   - It is still highly recommended to keep MenuLib as the in-game Spawn Manager menu is missing without it.

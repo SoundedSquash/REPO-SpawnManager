@@ -10,6 +10,8 @@ namespace SpawnManager.Managers
     {
         // Type REPOButton. Not explicitly set to support soft dependency.
         private static object? _currentPageButton;
+
+        private static int levelCount = 0;
         
         public static void Initialize()
         {
@@ -25,11 +27,14 @@ namespace SpawnManager.Managers
         private static REPOPopupPage CreatePopup()
         {
             var menu = MenuAPI.CreateREPOPopupPage("Spawn Manager", REPOPopupPage.PresetSide.Left, false, true);
-            
+
+            levelCount = LevelManager.GetAllLevels().Count();
+
             LevelManager.RestoreLevels();
             ValuableManager.RestoreValuableObjects();
             
             CreateEnemyPage(menu);
+            CreateLevelEnemyPage(menu);
             CreateValuablePage(menu);
             CreateLevelPage(menu, out var levelButton);
             
@@ -51,7 +56,7 @@ namespace SpawnManager.Managers
                         menu.ClosePage(true);
                     },
                     parent,
-                    new Vector2(77f, 34f))
+                    new Vector2(77f, 20f))
             );
 
             return menu;
@@ -129,6 +134,7 @@ namespace SpawnManager.Managers
                     }
 
                     _currentPageButton = button;
+
                     enemyPage.OpenPage(true);
                 };
 
@@ -136,11 +142,103 @@ namespace SpawnManager.Managers
             });
         }
 
+        private static void CreateLevelEnemyPage(REPOPopupPage menu)
+        {
+            foreach (Level level in LevelManager.GetAllLevels().OrderBy(vo => vo.name))
+            {
+                menu.AddElementToScrollView(parent =>
+                {
+                    string friendlyName = level.FriendlyName();
+                    var button = MenuAPI.CreateREPOButton($"{friendlyName} - Enemies", null, parent, new Vector2(0f, -80f + 0 + levelCount * -34f));
+
+                    button.onClick = () =>
+                    {
+                        if (ReferenceEquals(_currentPageButton, button))
+                            return;
+
+                        MenuAPI.CloseAllPagesAddedOnTop();
+
+                        var enemyPage =
+                            MenuAPI.CreateREPOPopupPage($"{friendlyName} - Enemies", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
+
+                        enemyPage.AddElement(enemyPageParent =>
+                            MenuAPI.CreateREPOButton("Enable All",
+                                () =>
+                                {
+                                    MenuAPI.OpenPopup($"Enable All", Color.red,
+                                        $"Enable all enemies?",
+                                        () => {
+                                            if (Settings.DisabledLevelEnemies.TryGetValue(level.name, out var configEntry))
+                                            {
+                                                configEntry.BoxedValue = configEntry.DefaultValue;
+
+                                                // Reopen page to refresh
+                                                _currentPageButton = null;
+                                                button.onClick.Invoke();
+                                            }
+                                        });
+                                },
+                                enemyPageParent,
+                                new Vector2(367f, 20f)
+                            )
+                        );
+
+                        enemyPage.AddElement(enemyPageParent =>
+                            MenuAPI.CreateREPOButton("Disable All",
+                                () =>
+                                {
+                                    MenuAPI.OpenPopup($"Disable All", Color.red,
+                                        $"Disable all enemies?",
+                                        () =>
+                                        {
+                                            if (Settings.DisabledLevelEnemies.TryGetValue(level.name, out var configEntry))
+                                            {
+                                                configEntry.Value = string.Join(',', EnemyManager.EnemySpawnList.Select(kvp => kvp.Key));
+
+                                                // Reopen page to refresh
+                                                _currentPageButton = null;
+                                                button.onClick.Invoke();
+                                            }
+                                        });
+                                }, enemyPageParent, new Vector2(536f, 20f)
+                            )
+                        );
+
+                        EnemyManager.RefreshAllEnemyNames();
+                        Settings.Logger.LogDebug("Refreshed enemy names for menu.");
+                        var enemiesDictionary = EnemyManager.EnemySpawnList;
+                        var enemyNames = enemiesDictionary.Keys.ToList();
+                        enemyNames.Sort();
+
+                        foreach (var name in enemyNames)
+                        {
+                            enemyPage.AddElementToScrollView(enemyPageParent =>
+                            {
+                                var configEntry = Settings.DisabledLevelEnemies[level.name];
+                                return MenuAPI.CreateREPOToggle(name,
+                                    b => { Settings.UpdateSettingsListEntry(configEntry, name, b); },
+                                    enemyPageParent, default, "ON", "OFF",
+                                    Settings.IsSettingsListEntryEnabled(configEntry, name)).rectTransform;
+                            });
+                        }
+
+                        _currentPageButton = button;
+
+                        enemyPage.OpenPage(true);
+                    };
+
+                    return button.rectTransform;
+                });
+            }
+
+            
+        }
+
         private static void CreateValuablePage(REPOPopupPage menu)
         {
             menu.AddElementToScrollView(parent =>
             {
-                var button = MenuAPI.CreateREPOButton("Valuables", null, parent, new Vector2(0f, -80f + 1 * -34f));
+                var button = MenuAPI.CreateREPOButton("Valuables", null, parent, new Vector2(0f, -80f + 1 + levelCount * -34f));
                 
                 button.onClick = () =>
                 {
@@ -237,7 +335,7 @@ namespace SpawnManager.Managers
             REPOButton localButton = null!;
             menu.AddElementToScrollView(parent =>
             {
-                var button = MenuAPI.CreateREPOButton("Levels", null, parent, new Vector2(0f, -80f + 1 * -34f));
+                var button = MenuAPI.CreateREPOButton("Levels", null, parent, new Vector2(0f, -80f + 1 + levelCount * -34f));
                 
                 button.onClick = () =>
                 {
