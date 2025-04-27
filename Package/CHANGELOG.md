@@ -1,5 +1,5 @@
 ## 0.4.0
-- Added feature to disable enemy spawns on a per-level basis
+- Added feature to disable enemy spawns on a per-level basis (thanks [Justin-dr](https://github.com/Justin-dr))
 
 ## 0.3.3
 - MenuLib is now a soft dependency, meaning it's not a requirement.
