@@ -10,7 +10,7 @@ namespace SpawnManager.Patches
         [HarmonyPatch("Awake")]
         [HarmonyPrefix]
         [HarmonyPriority(Priority.Last)]
-        static void RunManagerStartPrefix()
+        static void RunManagerAwakePrefix()
         {
             if (SemiFunc.MenuLevel())
             {

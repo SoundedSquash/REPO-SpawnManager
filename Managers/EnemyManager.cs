@@ -23,6 +23,9 @@ namespace SpawnManager.Managers
 
         public static void RemoveEnemies()
         {
+            // Ensure per-level enemies settings are loaded.
+            Settings.InitializeEnemiesLevels();
+            
             var disabledEnemyNames = Settings.GetDisabledSettingsEntryListNames(Settings.DisabledEnemies);
 
             string? currentLevelName = RunManager.instance.levelCurrent?.name;

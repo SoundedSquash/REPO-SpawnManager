@@ -1,3 +1,7 @@
+## 0.4.2
+- Fixed bug where per level enemies would not be applied if spawn manager menu has not been opened before starting a run.
+- Bumped MenuLib to 2.4.1.
+
 ## 0.4.1
 - Fixed menus for custom level enemies not working.
 
