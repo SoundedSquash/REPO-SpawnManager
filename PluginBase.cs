@@ -10,7 +10,7 @@ namespace SpawnManager
     {
         private const string PluginGuid = "soundedsquash.spawnmanager";
         private const string PluginName = "Enemy/Valuable Spawn Manager";
-        private const string PluginVersion = "0.4.0.0";
+        private const string PluginVersion = "0.4.1.0";
         
         private readonly Harmony _harmony = new Harmony(PluginGuid);
 
@@ -33,11 +33,6 @@ namespace SpawnManager
 
             _harmony.PatchAll();
             ManualLogSource.LogInfo($"{PluginName} loaded");
-        }
-
-        public void Start()
-        {
-            Settings.LateInitialize(Config);
         }
     }
 }

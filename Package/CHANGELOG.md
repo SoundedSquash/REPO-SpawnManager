@@ -1,3 +1,6 @@
+## 0.4.1
+- Fixed menus for custom level enemies not working.
+
 ## 0.4.0
 - Added feature to disable enemy spawns on a per-level basis (thanks [Justin-dr](https://github.com/Justin-dr))
 

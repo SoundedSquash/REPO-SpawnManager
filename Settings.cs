@@ -20,55 +20,65 @@ namespace SpawnManager
 
         public static ManualLogSource Logger { get; private set; } = null!;
         
+        private static ConfigFile Config { get; set; } = null!;
+        
+        private static bool LevelsInitialized { get; set; } = false;
+        
         private const string HideFromRepoConfig = "HideREPOConfig";
 
         internal static void Initialize(ConfigFile config, ManualLogSource logger)
         {
+            Config = config;
             Logger = logger;
             
-            _ = config.Bind(
+            _ = Config.Bind(
                 "Do Not Use",
                 "Use Spawn Manager button on main menu",
                 0f,
                 "Use Spawn Manager button on main menu");
             
-            DisabledEnemies = config.Bind(
+            DisabledEnemies = Config.Bind(
                 "Enemies",
                 "DisabledList",
                 "",
                 new ConfigDescription("Comma-separated list of enemy names to disable. (e.g. \"Apex Predator,Headman\")", null, HideFromRepoConfig));
             
-            DefaultValuable = config.Bind(
+            DefaultValuable = Config.Bind(
                 "Valuables",
                 "Default",
                 "Valuable Goblet",
                 new ConfigDescription("A single tiny valuable used to fill when there aren't enough valuables enabled in the level. (e.g. \"Valuable Diamond\")", null, HideFromRepoConfig));
             
-            DisabledValuables = config.Bind(
+            DisabledValuables = Config.Bind(
                 "Valuables",
                 "DisabledList",
                 "",
                 new ConfigDescription("Comma-separated list of valuable names to disable. (e.g. \"Valuable Television,Valuable Diamond Display\")", null, HideFromRepoConfig));
             
-            DisabledLevels = config.Bind(
+            DisabledLevels = Config.Bind(
                 "Levels",
                 "DisabledList",
                 "",
                 new ConfigDescription("Comma-separated list of level names to disable. (e.g. \"Level - Manor\")", null, HideFromRepoConfig));
         }
 
-        internal static void LateInitialize(ConfigFile config)
+        internal static void InitializeEnemiesLevels()
         {
-            foreach (Level level in LevelManager.GetAllLevels())
+            // Ensure this is only run once.
+            if (LevelsInitialized) return;
+            
+            foreach (var level in LevelManager.GetAllLevels())
             {
-                ConfigEntry<string> configBinding = config.Bind(
-                "Levels",
+                var configBinding = Config.Bind(
+                "Levels", // Should be in Enemies. TODO change to Enemies if values can be transferred.
                 $"{level.FriendlyName()} - Disabled Enemies",
                 "",
-                new ConfigDescription("Comma-separated list of enemy names to disable in this level. (e.g. \\\"Apex Predator,Headman\\\")", null, HideFromRepoConfig));
+                new ConfigDescription("Comma-separated list of enemy names to disable in this level. (e.g. \"Apex Predator,Headman\")", null, HideFromRepoConfig));
 
                 DisabledLevelEnemies.Add(level.name, configBinding);
             }
+            
+            LevelsInitialized = true;
         }
 
         public static ISet<string> GetDisabledEnemiesForLevel(string level)

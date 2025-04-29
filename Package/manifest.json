@@ -1,7 +1,7 @@
 ﻿{
   "name": "Enemy_And_Valuable_Spawn_Manager",
   "description": "Disable/Remove which enemies, valuables, and levels are allowed during the game! Only the host needs this mod.",
-  "version_number": "0.4.0",
+  "version_number": "0.4.1",
   "dependencies": [
     "BepInEx-BepInExPack-5.4.2100",
     "nickklmao-MenuLib-2.3.0"
