@@ -16,6 +16,8 @@ namespace SpawnManager
 
         public static IDictionary<string, ConfigEntry<string>> DisabledLevelEnemies { get; private set; } = new Dictionary<string, ConfigEntry<string>>();
         
+        public static ConfigEntry<string> DisabledItems { get; private set; } = null!;
+        
         public static ConfigEntry<string> DefaultValuable { get; private set; } = null!;
 
         public static ManualLogSource Logger { get; private set; } = null!;
@@ -60,6 +62,12 @@ namespace SpawnManager
                 "DisabledList",
                 "",
                 new ConfigDescription("Comma-separated list of level names to disable. (e.g. \"Level - Manor\")", null, HideFromRepoConfig));
+            
+            DisabledItems = Config.Bind(
+                "Items",
+                "DisabledList",
+                "",
+                new ConfigDescription("Comma-separated list of item names to disable. (e.g. \"Item Cart Medium\")", null, HideFromRepoConfig));
         }
 
         internal static void InitializeEnemiesLevels()
