@@ -32,6 +32,7 @@ namespace SpawnManager.Managers
 
             LevelManager.RestoreLevels();
             ValuableManager.RestoreValuableObjects();
+            ItemsManager.RestoreItems();
             
             // Initialize settings for level enemies here, long after custom levels are loaded.
             Settings.InitializeEnemiesLevels();
@@ -461,7 +462,7 @@ namespace SpawnManager.Managers
                                     () =>
                                     {
                                         Settings.DisabledItems.Value = string.Join(',',
-                                            ItemManager.GetAllItems().Select(l => l.Key));
+                                            ItemsManager.GetAllItems().Select(l => l.Key));
                                         
                                         // Reopen page to refresh
                                         _currentPageButton = null;
@@ -471,7 +472,7 @@ namespace SpawnManager.Managers
                         )
                     );
                     
-                    var itemsList = ItemManager.GetAllItems().Keys.OrderBy(key => key);
+                    var itemsList = ItemsManager.GetAllItems().Keys.OrderBy(key => key);
         
                     foreach (var item in itemsList)
                     {

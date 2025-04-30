@@ -5,7 +5,8 @@ using Random = UnityEngine.Random;
 
 namespace SpawnManager.Managers
 {
-    public static class ItemManager
+    // Called Items as the game already has an ItemManager. 
+    public static class ItemsManager
     {
         private static Dictionary<string, Item> _removedList = new Dictionary<string, Item>();
 
