@@ -112,7 +112,7 @@ namespace SpawnManager.Managers
                     MenuAPI.CloseAllPagesAddedOnTop();
 
                     var enemyPage =
-                        MenuAPI.CreateREPOPopupPage("Enemies", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
+                        MenuAPI.CreateREPOPopupPage("Global", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
 
                     enemyPage.AddElement(enemyPageParent => 
                         MenuAPI.CreateREPOButton("Enable All",
@@ -185,7 +185,7 @@ namespace SpawnManager.Managers
                 menu.AddElementToScrollView(parent =>
                 {
                     string friendlyName = level.FriendlyName();
-                    var button = MenuAPI.CreateREPOButton($"{friendlyName} - Enemies", null, parent, new Vector2(0f, -80f + 0 + levelCount * -34f));
+                    var button = MenuAPI.CreateREPOButton($"{friendlyName}", null, parent, new Vector2(0f, -80f + 0 + levelCount * -34f));
 
                     button.onClick = () =>
                     {
@@ -195,7 +195,7 @@ namespace SpawnManager.Managers
                         MenuAPI.CloseAllPagesAddedOnTop();
 
                         var enemyPage =
-                            MenuAPI.CreateREPOPopupPage($"{friendlyName} - Enemies", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
+                            MenuAPI.CreateREPOPopupPage($"{friendlyName}", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
 
                         enemyPage.AddElement(enemyPageParent =>
                             MenuAPI.CreateREPOButton("Enable All",
