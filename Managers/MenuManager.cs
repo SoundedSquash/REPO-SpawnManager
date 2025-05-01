@@ -32,6 +32,7 @@ namespace SpawnManager.Managers
 
             LevelManager.RestoreLevels();
             ValuableManager.RestoreValuableObjects();
+            ItemsManager.RestoreItems();
             
             // Initialize settings for level enemies here, long after custom levels are loaded.
             Settings.InitializeEnemiesLevels();
@@ -40,6 +41,7 @@ namespace SpawnManager.Managers
             CreateLevelEnemyPage(menu);
             CreateValuablePage(menu);
             CreateLevelPage(menu, out var levelButton);
+            CreateItemPage(menu);
             
             menu.AddElement(parent => 
                 MenuAPI.CreateREPOButton("Back", 
@@ -412,6 +414,83 @@ namespace SpawnManager.Managers
             });
             
             levelButton = localButton;
+        }
+
+        private static void CreateItemPage(REPOPopupPage menu)
+        {
+            menu.AddElementToScrollView(parent =>
+            {
+                var button = MenuAPI.CreateREPOButton("Shop Items", null, parent, new Vector2(0f, -80f + 1 + levelCount * -34f));
+                
+                button.onClick = () =>
+                {
+                    if (ReferenceEquals(_currentPageButton, button))
+                        return;
+
+                    MenuAPI.CloseAllPagesAddedOnTop();
+                    
+                    var itemPage =
+                        MenuAPI.CreateREPOPopupPage("Shop Items", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
+
+                    itemPage.AddElement(itemPageParent => 
+                        MenuAPI.CreateREPOButton("Enable All",
+                            () =>
+                            {
+                                MenuAPI.OpenPopup($"Enable All", Color.red,
+                                    $"Enable all shop items?",
+                                    () =>
+                                    {
+                                        Settings.DisabledItems.BoxedValue = Settings.DisabledItems.DefaultValue;
+
+                                        // Reopen page to refresh
+                                        _currentPageButton = null;
+                                        button.onClick.Invoke();
+                                    }
+                                );
+                            },
+                            itemPageParent,
+                            new Vector2(367f, 20f)
+                        )
+                    );
+                    
+                    itemPage.AddElement(itemPageParent => 
+                        MenuAPI.CreateREPOButton("Disable All",
+                            () =>
+                            {
+                                MenuAPI.OpenPopup($"Disable All", Color.red,
+                                    $"Disable all shop items?",
+                                    () =>
+                                    {
+                                        Settings.DisabledItems.Value = string.Join(',',
+                                            ItemsManager.GetAllItems().Select(l => l.Key.ToItemFriendlyName()));
+                                        
+                                        // Reopen page to refresh
+                                        _currentPageButton = null;
+                                        button.onClick.Invoke();
+                                    });
+                            }, itemPageParent, new Vector2(536f, 20f)
+                        )
+                    );
+                    
+                    var itemsList = ItemsManager.GetAllItems().Keys.Select(item => item.ToItemFriendlyName()).OrderBy(itemName => itemName);
+        
+                    foreach (var item in itemsList)
+                    {
+                        itemPage.AddElementToScrollView(itemPageParent =>
+                        {
+                            return MenuAPI.CreateREPOToggle(item,
+                                b => { Settings.UpdateSettingsListEntry(Settings.DisabledItems, item, b); },
+                                itemPageParent, default, "ON", "OFF",
+                                Settings.IsSettingsListEntryEnabled(Settings.DisabledItems, item)).rectTransform;
+                        });
+                    }
+        
+                    _currentPageButton = button;
+                    itemPage.OpenPage(true);
+                };
+                
+                return button.rectTransform;
+            });
         }
     }
 }
