@@ -1,3 +1,7 @@
+## 0.5.0
+- Added support for disabling shop items!
+- Reordered the menu so per-level enemies buttons are last.
+
 ## 0.4.2
 - Fixed bug where per level enemies would not be applied if spawn manager menu has not been opened before starting a run.
 - Bumped MenuLib to 2.4.1.
