@@ -40,8 +40,7 @@ namespace SpawnManager.Managers
             CreateValuablePage(menu);
             CreateItemPage(menu);
             CreateLevelPage(menu, out var levelButton);
-            CreateEnemyPage(menu);
-            CreateLevelEnemyPage(menu);
+            CreateSubMenuEnemies(menu);
             
             menu.AddElement(parent => 
                 MenuAPI.CreateREPOButton("Back", 
@@ -67,11 +66,43 @@ namespace SpawnManager.Managers
             return menu;
         }
 
+        private static void CreateSubMenuEnemies(REPOPopupPage menu)
+        {
+            menu.AddElementToScrollView(parent =>
+            {
+                var button = MenuAPI.CreateREPOButton("Enemies", null, parent);
+
+                button.onClick = () =>
+                {
+                    var subMenu = MenuAPI.CreateREPOPopupPage("Enemies", REPOPopupPage.PresetSide.Left, false, true);
+                    
+                    CreateEnemyPage(subMenu);
+                    CreateLevelEnemyPage(subMenu);
+                    
+                    subMenu.AddElement(subMenuparent => 
+                        MenuAPI.CreateREPOButton("Back", 
+                            () =>
+                            {
+                                subMenu.ClosePage(true);
+                                CreatePopup().OpenPage(false);
+                            },
+                            subMenuparent,
+                            new Vector2(77f, 20f))
+                    );
+                    
+                    menu.ClosePage(true);
+                    subMenu.OpenPage(false);
+                };
+                
+                return button.rectTransform;
+            });
+        }
+
         private static void CreateEnemyPage(REPOPopupPage menu)
         {
             menu.AddElementToScrollView(parent =>
             {
-                var button = MenuAPI.CreateREPOButton("Enemies", null, parent, new Vector2(0f, -80f + 0 * -34f));
+                var button = MenuAPI.CreateREPOButton("Global", null, parent, new Vector2(0f, -80f + 0 * -34f));
 
                 button.onClick = () =>
                 {
