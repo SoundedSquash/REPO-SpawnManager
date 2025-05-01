@@ -37,11 +37,10 @@ namespace SpawnManager.Managers
             // Initialize settings for level enemies here, long after custom levels are loaded.
             Settings.InitializeEnemiesLevels();
             
-            CreateValuablePage(menu);
-            CreateItemPage(menu);
-            CreateLevelPage(menu, out var levelButton);
-            CreateEnemyPage(menu);
-            CreateLevelEnemyPage(menu);
+            CreateSubMenuEnemies(menu); // Enemies
+            CreateLevelPage(menu, out var levelButton); // Levels
+            CreateItemPage(menu); // Shop Items
+            CreateValuablePage(menu); // Valuables
             
             menu.AddElement(parent => 
                 MenuAPI.CreateREPOButton("Back", 
@@ -67,11 +66,43 @@ namespace SpawnManager.Managers
             return menu;
         }
 
+        private static void CreateSubMenuEnemies(REPOPopupPage menu)
+        {
+            menu.AddElementToScrollView(parent =>
+            {
+                var button = MenuAPI.CreateREPOButton("Enemies", null, parent);
+
+                button.onClick = () =>
+                {
+                    var subMenu = MenuAPI.CreateREPOPopupPage("Enemies", REPOPopupPage.PresetSide.Left, false, true);
+                    
+                    CreateEnemyPage(subMenu);
+                    CreateLevelEnemyPage(subMenu);
+                    
+                    subMenu.AddElement(subMenuparent => 
+                        MenuAPI.CreateREPOButton("Back", 
+                            () =>
+                            {
+                                subMenu.ClosePage(true);
+                                CreatePopup().OpenPage(false);
+                            },
+                            subMenuparent,
+                            new Vector2(77f, 20f))
+                    );
+                    
+                    menu.ClosePage(true);
+                    subMenu.OpenPage(false);
+                };
+                
+                return button.rectTransform;
+            });
+        }
+
         private static void CreateEnemyPage(REPOPopupPage menu)
         {
             menu.AddElementToScrollView(parent =>
             {
-                var button = MenuAPI.CreateREPOButton("Enemies", null, parent, new Vector2(0f, -80f + 0 * -34f));
+                var button = MenuAPI.CreateREPOButton("Global", null, parent, new Vector2(0f, -80f + 0 * -34f));
 
                 button.onClick = () =>
                 {
@@ -81,7 +112,7 @@ namespace SpawnManager.Managers
                     MenuAPI.CloseAllPagesAddedOnTop();
 
                     var enemyPage =
-                        MenuAPI.CreateREPOPopupPage("Enemies", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
+                        MenuAPI.CreateREPOPopupPage("Global", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
 
                     enemyPage.AddElement(enemyPageParent => 
                         MenuAPI.CreateREPOButton("Enable All",
@@ -154,7 +185,7 @@ namespace SpawnManager.Managers
                 menu.AddElementToScrollView(parent =>
                 {
                     string friendlyName = level.FriendlyName();
-                    var button = MenuAPI.CreateREPOButton($"{friendlyName} - Enemies", null, parent, new Vector2(0f, -80f + 0 + levelCount * -34f));
+                    var button = MenuAPI.CreateREPOButton($"{friendlyName}", null, parent, new Vector2(0f, -80f + 0 + levelCount * -34f));
 
                     button.onClick = () =>
                     {
@@ -164,7 +195,7 @@ namespace SpawnManager.Managers
                         MenuAPI.CloseAllPagesAddedOnTop();
 
                         var enemyPage =
-                            MenuAPI.CreateREPOPopupPage($"{friendlyName} - Enemies", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
+                            MenuAPI.CreateREPOPopupPage($"{friendlyName}", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
 
                         enemyPage.AddElement(enemyPageParent =>
                             MenuAPI.CreateREPOButton("Enable All",
