@@ -23,6 +23,12 @@
         {
             return levelValuables.name;
         }
+        
+        // Item
+        public static string ToItemFriendlyName(this string item)
+        {
+            return item.Replace("Item ", "").Trim();
+        }
 
         public static bool IsGenericList(this LevelValuables levelValuables)
         {

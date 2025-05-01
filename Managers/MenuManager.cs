@@ -462,7 +462,7 @@ namespace SpawnManager.Managers
                                     () =>
                                     {
                                         Settings.DisabledItems.Value = string.Join(',',
-                                            ItemsManager.GetAllItems().Select(l => l.Key));
+                                            ItemsManager.GetAllItems().Select(l => l.Key.ToItemFriendlyName()));
                                         
                                         // Reopen page to refresh
                                         _currentPageButton = null;
@@ -472,7 +472,7 @@ namespace SpawnManager.Managers
                         )
                     );
                     
-                    var itemsList = ItemsManager.GetAllItems().Keys.OrderBy(key => key);
+                    var itemsList = ItemsManager.GetAllItems().Keys.Select(item => item.ToItemFriendlyName()).OrderBy(itemName => itemName);
         
                     foreach (var item in itemsList)
                     {
