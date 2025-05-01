@@ -55,6 +55,8 @@ namespace SpawnManager.Managers
 
         public static void RemoveValuables()
         {
+            if (SemiFunc.IsNotMasterClient()) return;
+            
             var disabledValuableNames = Settings.GetDisabledSettingsEntryListNames(Settings.DisabledValuables);
             if (disabledValuableNames.Count == 0) return;
             

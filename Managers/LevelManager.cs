@@ -15,6 +15,7 @@ namespace SpawnManager.Managers
 
         public static void RemoveLevels()
         {
+            if (SemiFunc.IsNotMasterClient()) return;
             if (!RunManagerLevelVariableIsAvailable) return;
             
             List<string> disabledLevelNames = Settings.GetDisabledSettingsEntryListNames(Settings.DisabledLevels);

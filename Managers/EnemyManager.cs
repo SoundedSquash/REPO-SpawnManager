@@ -23,6 +23,7 @@ namespace SpawnManager.Managers
 
         public static void RemoveEnemies()
         {
+            if (SemiFunc.IsNotMasterClient()) return;
             // Ensure per-level enemies settings are loaded.
             Settings.InitializeEnemiesLevels();
             
