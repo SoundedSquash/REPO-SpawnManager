@@ -17,6 +17,7 @@ namespace SpawnManager.Managers
 
         public static void RemoveItems()
         {
+            if (SemiFunc.IsNotMasterClient()) return;
             if (!StatsManagerItemDictionaryIsAvailable) return;
             
             List<string> disabledItemNames = Settings.GetDisabledSettingsEntryListNames(Settings.DisabledItems);
@@ -24,7 +25,7 @@ namespace SpawnManager.Managers
             StatsManager.instance.itemDictionary.Where(keyValuePair => disabledItemNames.Contains(keyValuePair.Key)).ToList().ForEach(keyValuePair =>
             {
                 Settings.Logger.LogDebug($"Removed item {keyValuePair.Value.itemName}.");
-                _removedList.Add(keyValuePair.Key, keyValuePair.Value);
+                _removedList.TryAdd(keyValuePair.Key, keyValuePair.Value);
                 StatsManager.instance.itemDictionary.Remove(keyValuePair.Key);
             });
         }
@@ -38,7 +39,7 @@ namespace SpawnManager.Managers
             {
                 var keyValuePair = _removedList.ElementAt(i);
                 Settings.Logger.LogDebug($"Restored item {keyValuePair.Value.itemName}.");
-                StatsManager.instance.itemDictionary.Add(keyValuePair.Key, keyValuePair.Value);
+                StatsManager.instance.itemDictionary.TryAdd(keyValuePair.Key, keyValuePair.Value);
                 _removedList.Remove(keyValuePair.Key);
             }
         }

@@ -27,8 +27,6 @@ namespace SpawnManager.Patches
         {
             Settings.Logger.LogDebug("Removing levels.");
             LevelManager.RemoveLevels();
-            Settings.Logger.LogDebug("Removing items.");
-            ItemsManager.RemoveItems();
 
             if (__instance.levels.Count == 1)
             {
