@@ -37,11 +37,11 @@ namespace SpawnManager.Managers
             // Initialize settings for level enemies here, long after custom levels are loaded.
             Settings.InitializeEnemiesLevels();
             
+            CreateValuablePage(menu);
+            CreateItemPage(menu);
+            CreateLevelPage(menu, out var levelButton);
             CreateEnemyPage(menu);
             CreateLevelEnemyPage(menu);
-            CreateValuablePage(menu);
-            CreateLevelPage(menu, out var levelButton);
-            CreateItemPage(menu);
             
             menu.AddElement(parent => 
                 MenuAPI.CreateREPOButton("Back", 
