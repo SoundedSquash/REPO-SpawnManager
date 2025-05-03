@@ -11,6 +11,16 @@ namespace SpawnManager.Managers
 
         public static IEnumerable<Level> GetAllLevels() => _removedList.Concat(RunManager.instance.levels);
 
+        public static IEnumerable<Level> GetAllLevelsForItems()
+        {
+            var levels = GetAllLevels();
+            if (RunManagerLevelVariableIsAvailable)
+            {
+                levels = levels.Append(RunManager.instance.levelShop);
+            }
+            return levels;
+        }
+
         public static void RemoveLevels()
         {
             if (SemiFunc.IsNotMasterClient()) return;

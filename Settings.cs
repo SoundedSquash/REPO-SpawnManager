@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using SpawnManager.Extensions;
@@ -19,6 +20,8 @@ namespace SpawnManager
         public static IDictionary<string, ConfigEntry<string>> DisabledLevelEnemies { get; private set; } = new Dictionary<string, ConfigEntry<string>>();
         
         public static ConfigEntry<string> DisabledItems { get; private set; } = null!;
+
+        public static IDictionary<string, ConfigEntry<string>> DisabledLevelItems { get; private set; } = new Dictionary<string, ConfigEntry<string>>();
         
         public static ConfigEntry<string> DefaultValuable { get; private set; } = null!;
 
@@ -76,7 +79,7 @@ namespace SpawnManager
                 "Items",
                 "DisabledList",
                 "",
-                new ConfigDescription("Comma-separated list of item names to disable. (e.g. \"Item Cart Medium\")", null, HideFromRepoConfig));
+                new ConfigDescription("Comma-separated list of item names to disable. (e.g. \"Cart Medium\")", null, HideFromRepoConfig));
         }
 
         internal static void InitializeEnemiesLevels()
@@ -98,11 +101,40 @@ namespace SpawnManager
             LevelsInitialized = true;
         }
 
+        internal static void InitializeItemsLevels()
+        {
+            // We need to initialize this every time as LevelGenerator is run when registering with RepoLib, and more levels may have been registered after the first one.
+            // But we can't re-bind the same config entry, so we need to remove any that are already bound.
+            var levels = LevelManager.GetAllLevelsForItems()
+                .Where(level => !DisabledLevelItems.ContainsKey(level.name))
+                .ToList();
+            
+            foreach (var level in levels)
+            {
+                var configBinding = Config.Bind(
+                "Items",
+                $"{level.FriendlyName()} - Disabled Items",
+                "",
+                new ConfigDescription("Comma-separated list of item names to disable in this level. (e.g. \"Cart Medium\")", null, HideFromRepoConfig));
+
+                DisabledLevelItems.Add(level.name, configBinding);
+            }
+        }
+
         public static ISet<string> GetDisabledEnemiesForLevel(string level)
         {
             if (DisabledLevelEnemies.TryGetValue(level, out ConfigEntry<string> disabledEnemies))
             {
                 return new HashSet<string>(ConvertStringToList(disabledEnemies.Value));
+            }
+            return new HashSet<string>();
+        }
+
+        public static ISet<string> GetDisabledItemsForLevel(string level)
+        {
+            if (DisabledLevelItems.TryGetValue(level, out ConfigEntry<string> disabledItems))
+            {
+                return new HashSet<string>(ConvertStringToList(disabledItems.Value));
             }
             return new HashSet<string>();
         }
