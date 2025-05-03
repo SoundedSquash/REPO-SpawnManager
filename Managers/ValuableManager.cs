@@ -56,6 +56,7 @@ namespace SpawnManager.Managers
         public static void RemoveValuables()
         {
             if (SemiFunc.IsNotMasterClient()) return;
+            if (!LevelManager.RunManagerLevelVariableIsAvailable) return;
             
             RestoreValuableObjects();
             RefreshAllValuables();
@@ -67,7 +68,7 @@ namespace SpawnManager.Managers
 
             if (currentLevelName != null)
             {
-                var disabledValuableNamesForLevel = Settings.GetDisabledEnemiesForLevel(currentLevelName);
+                var disabledValuableNamesForLevel = Settings.GetDisabledValuablesForLevel(currentLevelName);
                 disabledValuableNames.AddRange(disabledValuableNamesForLevel);
             }
             if (disabledValuableNames.Count == 0) return;

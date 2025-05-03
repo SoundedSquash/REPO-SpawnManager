@@ -129,6 +129,7 @@ namespace SpawnManager
         {
             // Ensure this is only run once.
             if (ValuablesInitialized) return;
+            if (!LevelManager.RunManagerLevelVariableIsAvailable) return;
             
             foreach (var level in LevelManager.GetAllLevels())
             {
