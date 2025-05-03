@@ -1,3 +1,6 @@
+## 0.5.3
+- Added per-level items to the Spawn Manager menu. Includes the Shop level.
+
 ## 0.5.2
 - Add setting to disable the Spawn Manager button on the main menu.
 
