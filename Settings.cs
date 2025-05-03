@@ -31,8 +31,6 @@ namespace SpawnManager
         
         private static bool LevelsInitialized { get; set; } = false;
         
-        private static bool ItemsInitialized { get; set; } = false;
-        
         private const string HideFromRepoConfig = "HideREPOConfig";
 
         internal static void Initialize(ConfigFile config, ManualLogSource logger)
@@ -105,12 +103,11 @@ namespace SpawnManager
 
         internal static void InitializeItemsLevels()
         {
-            // Ensure this is only run once.
-            if (ItemsInitialized) return;
-
-            var levels = LevelManager.GetAllLevels().ToList();
-            // Add shop level.
-            levels.Add(RunManager.instance.levelShop);
+            // We need to initialize this every time as LevelGenerator is run when registering with RepoLib, and more levels may have been registered after the first one.
+            // But we can't re-bind the same config entry, so we need to remove any that are already bound.
+            var levels = LevelManager.GetAllLevelsForItems()
+                .Where(level => !DisabledLevelItems.ContainsKey(level.name))
+                .ToList();
             
             foreach (var level in levels)
             {
@@ -122,8 +119,6 @@ namespace SpawnManager
 
                 DisabledLevelItems.Add(level.name, configBinding);
             }
-            
-            ItemsInitialized = true;
         }
 
         public static ISet<string> GetDisabledEnemiesForLevel(string level)

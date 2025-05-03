@@ -580,11 +580,13 @@ namespace SpawnManager.Managers
 
         private static void CreateLevelItemPages(REPOPopupPage menu)
         {
-            foreach (Level level in LevelManager.GetAllLevels().OrderBy(vo => vo.name))
+            var levels = LevelManager.GetAllLevelsForItems().ToList();
+            
+            foreach (var level in levels.OrderBy(vo => vo.name))
             {
                 menu.AddElementToScrollView(parent =>
                 {
-                    string friendlyName = level.FriendlyName();
+                    var friendlyName = level.FriendlyName();
                     var button = MenuAPI.CreateREPOButton($"{friendlyName}", null, parent);
 
                     button.onClick = () =>
