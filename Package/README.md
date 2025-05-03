@@ -1,6 +1,6 @@
 ## Spawn Manager
 
-Use the Spawn Manager button on the main menu to enable or disable what spawns in the game.\
+Use the Spawn Manager button on the main menu to enable or disable what spawns in the game.
 
 Enemies can be disabled on a per-level basis. An example of how this works:
 - Enemy enabled in global config and disabled on Level - Manor: enemy will not spawn in the Manor level

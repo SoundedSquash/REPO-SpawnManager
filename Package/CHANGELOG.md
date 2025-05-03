@@ -1,3 +1,6 @@
+## 0.5.4
+- Fix a bug where per-level items wouldn't work in the same session.
+
 ## 0.5.3
 - Added per-level items to the Spawn Manager menu. Includes the Shop level.
 
