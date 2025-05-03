@@ -61,7 +61,7 @@ namespace SpawnManager.Managers
             
             CreateSubMenuEnemies(menu); // Enemies
             CreateLevelPage(menu, out var levelButton); // Levels
-            CreateItemPage(menu); // Shop Items
+            CreateSubMenuItems(menu); // Shop Items
             CreateValuablePage(menu); // Valuables
             
             menu.AddElement(parent => 
@@ -469,11 +469,43 @@ namespace SpawnManager.Managers
             levelButton = localButton;
         }
 
+        private static void CreateSubMenuItems(REPOPopupPage menu)
+        {
+            menu.AddElementToScrollView(parent =>
+            {
+                var button = MenuAPI.CreateREPOButton("Shop Items", null, parent);
+
+                button.onClick = () =>
+                {
+                    var subMenu = MenuAPI.CreateREPOPopupPage("Shop Items", REPOPopupPage.PresetSide.Left, false, true);
+                    
+                    CreateItemPage(subMenu);
+                    CreateLevelItemPages(subMenu);
+                    
+                    subMenu.AddElement(subMenuParent => 
+                        MenuAPI.CreateREPOButton("Back", 
+                            () =>
+                            {
+                                subMenu.ClosePage(true);
+                                CreatePopup().OpenPage(false);
+                            },
+                            subMenuParent,
+                            new Vector2(77f, 20f))
+                    );
+                    
+                    menu.ClosePage(true);
+                    subMenu.OpenPage(false);
+                };
+                
+                return button.rectTransform;
+            });
+        }
+
         private static void CreateItemPage(REPOPopupPage menu)
         {
             menu.AddElementToScrollView(parent =>
             {
-                var button = MenuAPI.CreateREPOButton("Shop Items", null, parent, new Vector2(0f, -80f + 1 + levelCount * -34f));
+                var button = MenuAPI.CreateREPOButton("Global", null, parent, new Vector2(0f, -80f + 1 + levelCount * -34f));
                 
                 button.onClick = () =>
                 {
@@ -483,7 +515,7 @@ namespace SpawnManager.Managers
                     MenuAPI.CloseAllPagesAddedOnTop();
                     
                     var itemPage =
-                        MenuAPI.CreateREPOPopupPage("Shop Items", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
+                        MenuAPI.CreateREPOPopupPage("Global", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
 
                     itemPage.AddElement(itemPageParent => 
                         MenuAPI.CreateREPOButton("Enable All",
@@ -544,6 +576,94 @@ namespace SpawnManager.Managers
                 
                 return button.rectTransform;
             });
+        }
+
+        private static void CreateLevelItemPages(REPOPopupPage menu)
+        {
+            foreach (Level level in LevelManager.GetAllLevels().OrderBy(vo => vo.name))
+            {
+                menu.AddElementToScrollView(parent =>
+                {
+                    string friendlyName = level.FriendlyName();
+                    var button = MenuAPI.CreateREPOButton($"{friendlyName}", null, parent);
+
+                    button.onClick = () =>
+                    {
+                        if (ReferenceEquals(_currentPageButton, button))
+                            return;
+
+                        MenuAPI.CloseAllPagesAddedOnTop();
+
+                        var itemPage =
+                            MenuAPI.CreateREPOPopupPage($"{friendlyName}", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
+
+                        itemPage.AddElement(itemPageParent =>
+                            MenuAPI.CreateREPOButton("Enable All",
+                                () =>
+                                {
+                                    MenuAPI.OpenPopup($"Enable All", Color.red,
+                                        $"Enable all shop items?",
+                                        () => {
+                                            if (Settings.DisabledLevelItems.TryGetValue(level.name, out var configEntry))
+                                            {
+                                                configEntry.BoxedValue = configEntry.DefaultValue;
+
+                                                // Reopen page to refresh
+                                                _currentPageButton = null;
+                                                button.onClick.Invoke();
+                                            }
+                                        });
+                                },
+                                itemPageParent,
+                                new Vector2(367f, 20f)
+                            )
+                        );
+
+                        itemPage.AddElement(itemPageParent =>
+                            MenuAPI.CreateREPOButton("Disable All",
+                                () =>
+                                {
+                                    MenuAPI.OpenPopup($"Disable All", Color.red,
+                                        $"Disable all shop items?",
+                                        () =>
+                                        {
+                                            if (Settings.DisabledLevelItems.TryGetValue(level.name, out var configEntry))
+                                            {
+                                                configEntry.Value = string.Join(',', ItemsManager.GetAllItems().Select(kvp => kvp.Key.ToItemFriendlyName()));
+
+                                                // Reopen page to refresh
+                                                _currentPageButton = null;
+                                                button.onClick.Invoke();
+                                            }
+                                        });
+                                }, itemPageParent, new Vector2(536f, 20f)
+                            )
+                        );
+
+                        var itemNames = ItemsManager.GetAllItems().Keys
+                            .Select(key => key.ToItemFriendlyName())
+                            .OrderBy(name => name).ToList();
+
+                        foreach (var name in itemNames)
+                        {
+                            itemPage.AddElementToScrollView(itemPageParent =>
+                            {
+                                var configEntry = Settings.DisabledLevelItems[level.name];
+                                return MenuAPI.CreateREPOToggle(name,
+                                    b => { Settings.UpdateSettingsListEntry(configEntry, name, b); },
+                                    itemPageParent, default, "ON", "OFF",
+                                    Settings.IsSettingsListEntryEnabled(configEntry, name)).rectTransform;
+                            });
+                        }
+
+                        _currentPageButton = button;
+
+                        itemPage.OpenPage(true);
+                    };
+
+                    return button.rectTransform;
+                });
+            }
         }
     }
 }
