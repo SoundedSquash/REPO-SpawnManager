@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using MenuLib;
 using MenuLib.MonoBehaviors;
 using SpawnManager.Extensions;
@@ -10,20 +11,40 @@ namespace SpawnManager.Managers
     {
         // Type REPOButton. Not explicitly set to support soft dependency.
         private static object? _currentPageButton;
+        private static object? _mainMenuButton;
 
         private static int levelCount = 0;
         
         public static void Initialize()
         {
-            MenuAPI.AddElementToMainMenu(parent => 
-                MenuAPI.CreateREPOButton("Spawn Manager",
-                    () => CreatePopup().OpenPage(false),
-                    parent,
-                    new Vector2(550f, 22f)
-                )
-            );
+            MenuAPI.AddElementToMainMenu(parent => CreateMainMenuButton(parent));
         }
-        
+
+        private static void CreateMainMenuButton(Transform parent)
+        {
+            _mainMenuButton = MenuAPI.CreateREPOButton("Spawn Manager",
+                () => CreatePopup().OpenPage(false),
+                parent,
+                new Vector2(550f, 22f)
+            );
+
+            SetMainMenuButtonVisibility();
+        }
+
+        private static void SetMainMenuButtonVisibility()
+        {
+            if (!SemiFunc.IsMainMenu()) return;
+            if (_mainMenuButton == null) return;
+
+            var button = (REPOButton)_mainMenuButton;
+            button.gameObject.SetActive(Settings.ShowSpawnManagerButton.Value);
+        }
+
+        public static void OnShowSpawnManagerButtonChanged(object sender, EventArgs args)
+        {
+            SetMainMenuButtonVisibility();
+        }
+
         private static REPOPopupPage CreatePopup()
         {
             var menu = MenuAPI.CreateREPOPopupPage("Spawn Manager", REPOPopupPage.PresetSide.Left, false, true);

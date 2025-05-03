@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using BepInEx.Configuration;
 using BepInEx.Logging;
+using MenuLib.MonoBehaviors;
 using SpawnManager.Extensions;
 using SpawnManager.Managers;
 
@@ -8,6 +9,8 @@ namespace SpawnManager
 {
     public static class Settings
     {
+        public static ConfigEntry<bool> ShowSpawnManagerButton { get; private set; } = null!;
+        
         public static ConfigEntry<string> DisabledEnemies { get; private set; } = null!;
 
         public static ConfigEntry<string> DisabledValuables { get; private set; } = null!;
@@ -32,6 +35,13 @@ namespace SpawnManager
         {
             Config = config;
             Logger = logger;
+            
+            var setting = ShowSpawnManagerButton = Config.Bind(
+                "General",
+                "ShowSpawnManagerButton",
+                true,
+                "Set to false to hide the Spawn Manager button on the main menu.");
+            setting.SettingChanged += MenuModManager.OnShowSpawnManagerButtonChanged;
             
             _ = Config.Bind(
                 "Do Not Use",
