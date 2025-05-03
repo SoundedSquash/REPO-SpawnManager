@@ -639,10 +639,9 @@ namespace SpawnManager.Managers
                                 }, itemPageParent, new Vector2(536f, 20f)
                             )
                         );
-
+                        
                         var itemNames = ItemsManager.GetAllItems().Keys
-                            .Select(key => key.ToItemFriendlyName())
-                            .OrderBy(name => name).ToList();
+                            .Select(item => item.ToItemFriendlyName()).OrderBy(itemName => itemName);
 
                         foreach (var name in itemNames)
                         {

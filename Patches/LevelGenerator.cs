@@ -3,13 +3,13 @@ using SpawnManager.Managers;
 
 namespace SpawnManager.Patches
 {
-    [HarmonyPatch(typeof(StatsManager))]
-    public static class StatsManagerPatches
+    [HarmonyPatch(typeof(LevelGenerator))]
+    public static class LevelGeneratorPatches
     {
-        [HarmonyPatch("RunStartStats")]
-        [HarmonyPostfix]
+        [HarmonyPatch(nameof(LevelGenerator.ItemSetup))]
+        [HarmonyPrefix]
         [HarmonyPriority(Priority.Last)]
-        static void StatsManagerRunStartStatsPostfix()
+        static void LevelGeneratorItemSetupPrefix()
         {
             Settings.Logger.LogDebug("Removing items.");
             Settings.InitializeItemsLevels();

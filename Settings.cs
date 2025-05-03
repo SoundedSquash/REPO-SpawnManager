@@ -130,6 +130,15 @@ namespace SpawnManager
             return new HashSet<string>();
         }
 
+        public static ISet<string> GetDisabledItemsForLevel(string level)
+        {
+            if (DisabledLevelItems.TryGetValue(level, out ConfigEntry<string> disabledItems))
+            {
+                return new HashSet<string>(ConvertStringToList(disabledItems.Value));
+            }
+            return new HashSet<string>();
+        }
+
         public static List<string> GetDisabledSettingsEntryListNames(ConfigEntry<string> settingsVariable)
         {
             return ConvertStringToList(settingsVariable.Value);

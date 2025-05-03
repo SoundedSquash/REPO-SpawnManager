@@ -21,6 +21,14 @@ namespace SpawnManager.Managers
             if (StatsManager.instance.itemDictionary.Count == 0) return;
             
             List<string> disabledItemNames = Settings.GetDisabledSettingsEntryListNames(Settings.DisabledItems);
+            
+            string? currentLevelName = RunManager.instance.levelCurrent?.name;
+
+            if (currentLevelName != null)
+            {
+                var disabledItemNamesForLevel = Settings.GetDisabledItemsForLevel(currentLevelName);
+                disabledItemNames.AddRange(disabledItemNamesForLevel);
+            }
 
             StatsManager.instance.itemDictionary.Where(keyValuePair => disabledItemNames.Contains(keyValuePair.Key.ToItemFriendlyName())).ToList().ForEach(keyValuePair =>
             {
