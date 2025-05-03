@@ -1,3 +1,6 @@
+## 0.5.1
+- Add setting to disable the Spawn Manager button on the main menu.
+
 ## 0.5.0
 - Added support for disabling shop items!
 - Reordered the menu so per-level enemies buttons are last.
