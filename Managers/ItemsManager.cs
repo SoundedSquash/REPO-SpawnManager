@@ -16,6 +16,9 @@ namespace SpawnManager.Managers
 
         public static void RemoveItems()
         {
+            // Restore all items so different levels can disable only their items.
+            RestoreItems();
+            
             if (SemiFunc.IsNotMasterClient()) return;
             if (!StatsManagerItemDictionaryIsAvailable) return;
             if (StatsManager.instance.itemDictionary.Count == 0) return;
