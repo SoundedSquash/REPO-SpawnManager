@@ -56,11 +56,22 @@ namespace SpawnManager.Managers
         public static void RemoveValuables()
         {
             if (SemiFunc.IsNotMasterClient()) return;
+            if (!LevelManager.RunManagerLevelVariableIsAvailable) return;
             
-            var disabledValuableNames = Settings.GetDisabledSettingsEntryListNames(Settings.DisabledValuables);
-            if (disabledValuableNames.Count == 0) return;
-            
+            RestoreValuableObjects();
             RefreshAllValuables();
+            
+            Settings.InitializeValuablesLevels();
+            var disabledValuableNames = Settings.GetDisabledSettingsEntryListNames(Settings.DisabledValuables);
+
+            string? currentLevelName = RunManager.instance.levelCurrent?.name;
+
+            if (currentLevelName != null)
+            {
+                var disabledValuableNamesForLevel = Settings.GetDisabledValuablesForLevel(currentLevelName);
+                disabledValuableNames.AddRange(disabledValuableNamesForLevel);
+            }
+            if (disabledValuableNames.Count == 0) return;
             
             var valuableObjectsToRemove = ValuableList.Where(valuableObject => disabledValuableNames.Contains(valuableObject.name))
                 .ToList();
@@ -115,6 +126,8 @@ namespace SpawnManager.Managers
                 smallerItems = smallerItems.Concat(valuablePreset.tall).ToList();
                 
                 if (!valuablePreset.veryTall.Any()) valuablePreset.veryTall.Add(smallerItems[Random.Range(0, smallerItems.Count)]);
+
+                isGenericProcessed = true;
             }
         }
 

@@ -7,7 +7,7 @@ namespace SpawnManager.Managers
     {
         private static List<Level> _removedList = new List<Level>();
 
-        private static bool RunManagerLevelVariableIsAvailable => RunManager.instance != null && RunManager.instance.levels != null;
+        public static bool RunManagerLevelVariableIsAvailable => RunManager.instance != null && RunManager.instance.levels != null;
 
         public static IEnumerable<Level> GetAllLevels() => _removedList.Concat(RunManager.instance.levels);
 

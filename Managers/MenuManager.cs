@@ -12,12 +12,10 @@ namespace SpawnManager.Managers
         // Type REPOButton. Not explicitly set to support soft dependency.
         private static object? _currentPageButton;
         private static object? _mainMenuButton;
-
-        private static int levelCount = 0;
         
         public static void Initialize()
         {
-            MenuAPI.AddElementToMainMenu(parent => CreateMainMenuButton(parent));
+            MenuAPI.AddElementToMainMenu(CreateMainMenuButton);
         }
 
         private static void CreateMainMenuButton(Transform parent)
@@ -49,8 +47,6 @@ namespace SpawnManager.Managers
         {
             var menu = MenuAPI.CreateREPOPopupPage("Spawn Manager", REPOPopupPage.PresetSide.Left, false, true);
 
-            levelCount = LevelManager.GetAllLevels().Count();
-
             LevelManager.RestoreLevels();
             ValuableManager.RestoreValuableObjects();
             ItemsManager.RestoreItems();
@@ -58,11 +54,12 @@ namespace SpawnManager.Managers
             // Initialize settings for per-levels here, long after custom levels are loaded.
             Settings.InitializeEnemiesLevels();
             Settings.InitializeItemsLevels();
+            Settings.InitializeValuablesLevels();
             
             CreateSubMenuEnemies(menu); // Enemies
             CreateLevelPage(menu, out var levelButton); // Levels
             CreateSubMenuItems(menu); // Shop Items
-            CreateValuablePage(menu); // Valuables
+            CreateSubMenuValuables(menu); // Valuables
             
             menu.AddElement(parent => 
                 MenuAPI.CreateREPOButton("Back", 
@@ -202,12 +199,12 @@ namespace SpawnManager.Managers
 
         private static void CreateLevelEnemyPage(REPOPopupPage menu)
         {
-            foreach (Level level in LevelManager.GetAllLevels().OrderBy(vo => vo.name))
+            foreach (var level in LevelManager.GetAllLevels().OrderBy(vo => vo.name))
             {
                 menu.AddElementToScrollView(parent =>
                 {
-                    string friendlyName = level.FriendlyName();
-                    var button = MenuAPI.CreateREPOButton($"{friendlyName}", null, parent, new Vector2(0f, -80f + 0 + levelCount * -34f));
+                    var friendlyName = level.FriendlyName();
+                    var button = MenuAPI.CreateREPOButton($"{friendlyName}", null, parent);
 
                     button.onClick = () =>
                     {
@@ -296,7 +293,7 @@ namespace SpawnManager.Managers
         {
             menu.AddElementToScrollView(parent =>
             {
-                var button = MenuAPI.CreateREPOButton("Valuables", null, parent, new Vector2(0f, -80f + 1 + levelCount * -34f));
+                var button = MenuAPI.CreateREPOButton("Global", null, parent);
                 
                 button.onClick = () =>
                 {
@@ -306,7 +303,7 @@ namespace SpawnManager.Managers
                     MenuAPI.CloseAllPagesAddedOnTop();
                     
                     var valuablePage =
-                        MenuAPI.CreateREPOPopupPage("Valuables", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
+                        MenuAPI.CreateREPOPopupPage("Global", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
 
                     valuablePage.AddElement(valuablePageParent => 
                         MenuAPI.CreateREPOButton("Enable All",
@@ -388,12 +385,135 @@ namespace SpawnManager.Managers
             });
         }
 
+        private static void CreateSubMenuValuables(REPOPopupPage menu)
+        {
+            menu.AddElementToScrollView(parent =>
+            {
+                var button = MenuAPI.CreateREPOButton("Valuables", null, parent);
+
+                button.onClick = () =>
+                {
+                    var subMenu = MenuAPI.CreateREPOPopupPage("Valuables", REPOPopupPage.PresetSide.Left, false, true);
+                    
+                    CreateValuablePage(subMenu);
+                    CreateLevelValuablesPages(subMenu);
+                    
+                    subMenu.AddElement(subMenuParent => 
+                        MenuAPI.CreateREPOButton("Back", 
+                            () =>
+                            {
+                                subMenu.ClosePage(true);
+                                CreatePopup().OpenPage(false);
+                            },
+                            subMenuParent,
+                            new Vector2(77f, 20f))
+                    );
+                    
+                    menu.ClosePage(true);
+                    subMenu.OpenPage(false);
+                };
+                
+                return button.rectTransform;
+            });
+        }
+
+        private static void CreateLevelValuablesPages(REPOPopupPage menu)
+        {
+            foreach (var level in LevelManager.GetAllLevels().OrderBy(vo => vo.name))
+            {
+                menu.AddElementToScrollView(parent =>
+                {
+                    var friendlyName = level.FriendlyName();
+                    var button = MenuAPI.CreateREPOButton($"{friendlyName}", null, parent);
+
+                    button.onClick = () =>
+                    {
+                        if (ReferenceEquals(_currentPageButton, button))
+                            return;
+
+                        MenuAPI.CloseAllPagesAddedOnTop();
+
+                        var page =
+                            MenuAPI.CreateREPOPopupPage($"{friendlyName}", REPOPopupPage.PresetSide.Right, shouldCachePage: false);
+
+                        page.AddElement(pageParent =>
+                            MenuAPI.CreateREPOButton("Enable All",
+                                () =>
+                                {
+                                    MenuAPI.OpenPopup($"Enable All", Color.red,
+                                        $"Enable all valuables?",
+                                        () => {
+                                            if (Settings.DisabledLevelValuables.TryGetValue(level.name, out var configEntry))
+                                            {
+                                                configEntry.BoxedValue = configEntry.DefaultValue;
+
+                                                // Reopen page to refresh
+                                                _currentPageButton = null;
+                                                button.onClick.Invoke();
+                                            }
+                                        });
+                                },
+                                pageParent,
+                                new Vector2(367f, 20f)
+                            )
+                        );
+
+                        page.AddElement(pageParent =>
+                            MenuAPI.CreateREPOButton("Disable All",
+                                () =>
+                                {
+                                    MenuAPI.OpenPopup($"Disable All", Color.red,
+                                        $"Disable all valuables?",
+                                        () =>
+                                        {
+                                            if (Settings.DisabledLevelValuables.TryGetValue(level.name, out var configEntry))
+                                            {
+                                                configEntry.Value = string.Join(',', ValuableManager.ValuableList.Select(vo => vo.name));
+
+                                                // Reopen page to refresh
+                                                _currentPageButton = null;
+                                                button.onClick.Invoke();
+                                            }
+                                        });
+                                }, pageParent, new Vector2(536f, 20f)
+                            )
+                        );
+
+                        ValuableManager.RefreshAllValuables();
+                        Settings.Logger.LogDebug($"Refreshed {ValuableManager.ValuableList.Count} valuable names for menu.");
+                        
+                        var valuablesList = ValuableManager.ValuableList.OrderBy(vo => vo.name);
+
+                        foreach (var valuableObject in valuablesList)
+                        {
+                            page.AddElementToScrollView(pageParent =>
+                            {
+                                var configEntry = Settings.DisabledLevelValuables[level.name];
+                                return MenuAPI.CreateREPOToggle(valuableObject.name,
+                                    b => { Settings.UpdateSettingsListEntry(configEntry, valuableObject.name, b); },
+                                    pageParent, default, "ON", "OFF",
+                                    Settings.IsSettingsListEntryEnabled(configEntry, valuableObject.name)).rectTransform;
+                            });
+                        }
+
+                        _currentPageButton = button;
+
+                        page.OpenPage(true);
+                    };
+
+                    return button.rectTransform;
+                });
+            }
+
+            
+        }
+
         private static void CreateLevelPage(REPOPopupPage menu, out REPOButton levelButton)
         {
             REPOButton localButton = null!;
             menu.AddElementToScrollView(parent =>
             {
-                var button = MenuAPI.CreateREPOButton("Levels", null, parent, new Vector2(0f, -80f + 1 + levelCount * -34f));
+                var button = MenuAPI.CreateREPOButton("Levels", null, parent);
                 
                 button.onClick = () =>
                 {
@@ -505,7 +625,7 @@ namespace SpawnManager.Managers
         {
             menu.AddElementToScrollView(parent =>
             {
-                var button = MenuAPI.CreateREPOButton("Global", null, parent, new Vector2(0f, -80f + 1 + levelCount * -34f));
+                var button = MenuAPI.CreateREPOButton("Global", null, parent);
                 
                 button.onClick = () =>
                 {
