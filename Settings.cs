@@ -15,6 +15,8 @@ namespace SpawnManager
 
         public static ConfigEntry<string> DisabledValuables { get; private set; } = null!;
 
+        public static IDictionary<string, ConfigEntry<string>> DisabledLevelValuables { get; private set; } = new Dictionary<string, ConfigEntry<string>>();
+
         public static ConfigEntry<string> DisabledLevels { get; private set; } = null!;
 
         public static IDictionary<string, ConfigEntry<string>> DisabledLevelEnemies { get; private set; } = new Dictionary<string, ConfigEntry<string>>();
@@ -30,6 +32,8 @@ namespace SpawnManager
         private static ConfigFile Config { get; set; } = null!;
         
         private static bool LevelsInitialized { get; set; } = false;
+        
+        private static bool ValuablesInitialized { get; set; } = false;
         
         private const string HideFromRepoConfig = "HideREPOConfig";
 
@@ -121,6 +125,25 @@ namespace SpawnManager
             }
         }
 
+        internal static void InitializeValuablesLevels()
+        {
+            // Ensure this is only run once.
+            if (ValuablesInitialized) return;
+            
+            foreach (var level in LevelManager.GetAllLevels())
+            {
+                var configBinding = Config.Bind(
+                    "Valuables",
+                    $"{level.FriendlyName()} - Disabled Valuables",
+                    "",
+                    new ConfigDescription("Comma-separated list of valuable names to disable. (e.g. \"Valuable Television,Valuable Diamond Display\")", null, HideFromRepoConfig));
+
+                DisabledLevelValuables.Add(level.name, configBinding);
+            }
+            
+            ValuablesInitialized = true;
+        }
+
         public static ISet<string> GetDisabledEnemiesForLevel(string level)
         {
             if (DisabledLevelEnemies.TryGetValue(level, out ConfigEntry<string> disabledEnemies))
@@ -135,6 +158,15 @@ namespace SpawnManager
             if (DisabledLevelItems.TryGetValue(level, out ConfigEntry<string> disabledItems))
             {
                 return new HashSet<string>(ConvertStringToList(disabledItems.Value));
+            }
+            return new HashSet<string>();
+        }
+
+        public static ISet<string> GetDisabledValuablesForLevel(string level)
+        {
+            if (DisabledLevelValuables.TryGetValue(level, out ConfigEntry<string> disabledValuables))
+            {
+                return new HashSet<string>(ConvertStringToList(disabledValuables.Value));
             }
             return new HashSet<string>();
         }
