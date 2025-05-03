@@ -12,6 +12,7 @@ namespace SpawnManager.Patches
         static void StatsManagerRunStartStatsPostfix()
         {
             Settings.Logger.LogDebug("Removing items.");
+            Settings.InitializeItemsLevels();
             ItemsManager.RemoveItems();
         }
     }

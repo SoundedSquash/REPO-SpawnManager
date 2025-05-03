@@ -19,6 +19,8 @@ namespace SpawnManager
         public static IDictionary<string, ConfigEntry<string>> DisabledLevelEnemies { get; private set; } = new Dictionary<string, ConfigEntry<string>>();
         
         public static ConfigEntry<string> DisabledItems { get; private set; } = null!;
+
+        public static IDictionary<string, ConfigEntry<string>> DisabledLevelItems { get; private set; } = new Dictionary<string, ConfigEntry<string>>();
         
         public static ConfigEntry<string> DefaultValuable { get; private set; } = null!;
 
@@ -27,6 +29,8 @@ namespace SpawnManager
         private static ConfigFile Config { get; set; } = null!;
         
         private static bool LevelsInitialized { get; set; } = false;
+        
+        private static bool ItemsInitialized { get; set; } = false;
         
         private const string HideFromRepoConfig = "HideREPOConfig";
 
@@ -96,6 +100,25 @@ namespace SpawnManager
             }
             
             LevelsInitialized = true;
+        }
+
+        internal static void InitializeItemsLevels()
+        {
+            // Ensure this is only run once.
+            if (ItemsInitialized) return;
+            
+            foreach (var level in LevelManager.GetAllLevels())
+            {
+                var configBinding = Config.Bind(
+                "Items",
+                $"{level.FriendlyName()} - Disabled Items",
+                "",
+                new ConfigDescription("Comma-separated list of item names to disable in this level. (e.g. \"Item Cart Medium\")", null, HideFromRepoConfig));
+
+                DisabledLevelItems.Add(level.name, configBinding);
+            }
+            
+            ItemsInitialized = true;
         }
 
         public static ISet<string> GetDisabledEnemiesForLevel(string level)

@@ -55,8 +55,9 @@ namespace SpawnManager.Managers
             ValuableManager.RestoreValuableObjects();
             ItemsManager.RestoreItems();
             
-            // Initialize settings for level enemies here, long after custom levels are loaded.
+            // Initialize settings for per-levels here, long after custom levels are loaded.
             Settings.InitializeEnemiesLevels();
+            Settings.InitializeItemsLevels();
             
             CreateSubMenuEnemies(menu); // Enemies
             CreateLevelPage(menu, out var levelButton); // Levels
