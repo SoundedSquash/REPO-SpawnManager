@@ -12,12 +12,10 @@ namespace SpawnManager.Managers
         // Type REPOButton. Not explicitly set to support soft dependency.
         private static object? _currentPageButton;
         private static object? _mainMenuButton;
-
-        private static int levelCount = 0;
         
         public static void Initialize()
         {
-            MenuAPI.AddElementToMainMenu(parent => CreateMainMenuButton(parent));
+            MenuAPI.AddElementToMainMenu(CreateMainMenuButton);
         }
 
         private static void CreateMainMenuButton(Transform parent)
@@ -48,8 +46,6 @@ namespace SpawnManager.Managers
         private static REPOPopupPage CreatePopup()
         {
             var menu = MenuAPI.CreateREPOPopupPage("Spawn Manager", REPOPopupPage.PresetSide.Left, false, true);
-
-            levelCount = LevelManager.GetAllLevels().Count();
 
             LevelManager.RestoreLevels();
             ValuableManager.RestoreValuableObjects();
@@ -203,12 +199,12 @@ namespace SpawnManager.Managers
 
         private static void CreateLevelEnemyPage(REPOPopupPage menu)
         {
-            foreach (Level level in LevelManager.GetAllLevels().OrderBy(vo => vo.name))
+            foreach (var level in LevelManager.GetAllLevels().OrderBy(vo => vo.name))
             {
                 menu.AddElementToScrollView(parent =>
                 {
-                    string friendlyName = level.FriendlyName();
-                    var button = MenuAPI.CreateREPOButton($"{friendlyName}", null, parent, new Vector2(0f, -80f + 0 + levelCount * -34f));
+                    var friendlyName = level.FriendlyName();
+                    var button = MenuAPI.CreateREPOButton($"{friendlyName}", null, parent);
 
                     button.onClick = () =>
                     {
@@ -517,7 +513,7 @@ namespace SpawnManager.Managers
             REPOButton localButton = null!;
             menu.AddElementToScrollView(parent =>
             {
-                var button = MenuAPI.CreateREPOButton("Levels", null, parent, new Vector2(0f, -80f + 1 + levelCount * -34f));
+                var button = MenuAPI.CreateREPOButton("Levels", null, parent);
                 
                 button.onClick = () =>
                 {
@@ -629,7 +625,7 @@ namespace SpawnManager.Managers
         {
             menu.AddElementToScrollView(parent =>
             {
-                var button = MenuAPI.CreateREPOButton("Global", null, parent, new Vector2(0f, -80f + 1 + levelCount * -34f));
+                var button = MenuAPI.CreateREPOButton("Global", null, parent);
                 
                 button.onClick = () =>
                 {
