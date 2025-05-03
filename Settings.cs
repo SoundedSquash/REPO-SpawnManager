@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using SpawnManager.Extensions;
@@ -80,7 +81,7 @@ namespace SpawnManager
                 "Items",
                 "DisabledList",
                 "",
-                new ConfigDescription("Comma-separated list of item names to disable. (e.g. \"Item Cart Medium\")", null, HideFromRepoConfig));
+                new ConfigDescription("Comma-separated list of item names to disable. (e.g. \"Cart Medium\")", null, HideFromRepoConfig));
         }
 
         internal static void InitializeEnemiesLevels()
@@ -106,14 +107,18 @@ namespace SpawnManager
         {
             // Ensure this is only run once.
             if (ItemsInitialized) return;
+
+            var levels = LevelManager.GetAllLevels().ToList();
+            // Add shop level.
+            levels.Add(RunManager.instance.levelShop);
             
-            foreach (var level in LevelManager.GetAllLevels())
+            foreach (var level in levels)
             {
                 var configBinding = Config.Bind(
                 "Items",
                 $"{level.FriendlyName()} - Disabled Items",
                 "",
-                new ConfigDescription("Comma-separated list of item names to disable in this level. (e.g. \"Item Cart Medium\")", null, HideFromRepoConfig));
+                new ConfigDescription("Comma-separated list of item names to disable in this level. (e.g. \"Cart Medium\")", null, HideFromRepoConfig));
 
                 DisabledLevelItems.Add(level.name, configBinding);
             }
