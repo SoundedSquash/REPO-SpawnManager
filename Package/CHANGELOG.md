@@ -1,3 +1,6 @@
+## 0.5.5
+- Added per-level valuables to the Spawn Manager menu.
+
 ## 0.5.4
 - Fix a bug where per-level items wouldn't work in the same session.
 
