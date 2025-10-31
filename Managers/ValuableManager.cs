@@ -35,14 +35,14 @@ namespace SpawnManager.Managers
                 }
 
                 ValuableList = RunManager.instance.levels.SelectMany(l => l.ValuablePresets ?? Enumerable.Empty<LevelValuables>())
-                    .SelectMany(lv => (lv?.tiny?.Where(go => go != null) ?? Enumerable.Empty<GameObject>())
-                        .Concat(lv?.small?.Where(go => go != null) ?? Enumerable.Empty<GameObject>())
-                        .Concat(lv?.medium?.Where(go => go != null) ?? Enumerable.Empty<GameObject>())
-                        .Concat(lv?.big?.Where(go => go != null) ?? Enumerable.Empty<GameObject>())
-                        .Concat(lv?.wide?.Where(go => go != null) ?? Enumerable.Empty<GameObject>())
-                        .Concat(lv?.tall?.Where(go => go != null) ?? Enumerable.Empty<GameObject>())
-                        .Concat(lv?.veryTall?.Where(go => go != null) ?? Enumerable.Empty<GameObject>()))
-                    .Select(go => go?.GetComponent<ValuableObject>())
+                    .SelectMany(lv => (lv?.tiny?.Where(go => go != null) ?? Enumerable.Empty<PrefabRef>())
+                        .Concat(lv?.small?.Where(go => go != null) ?? Enumerable.Empty<PrefabRef>())
+                        .Concat(lv?.medium?.Where(go => go != null) ?? Enumerable.Empty<PrefabRef>())
+                        .Concat(lv?.big?.Where(go => go != null) ?? Enumerable.Empty<PrefabRef>())
+                        .Concat(lv?.wide?.Where(go => go != null) ?? Enumerable.Empty<PrefabRef>())
+                        .Concat(lv?.tall?.Where(go => go != null) ?? Enumerable.Empty<PrefabRef>())
+                        .Concat(lv?.veryTall?.Where(go => go != null) ?? Enumerable.Empty<PrefabRef>()))
+                    .Select(go => go?.Prefab.GetComponent<ValuableObject>())
                     .Where(vo => vo != null)
                     .Distinct()
                     .ToList()!;
@@ -104,7 +104,7 @@ namespace SpawnManager.Managers
                 
                 if (!valuablePreset.tiny.Any())
                 {
-                    valuablePreset.tiny.Add(AllItems.First(i => i.Key == Settings.DefaultValuable.Value).Value.ValuableGameObject);
+                    valuablePreset.tiny.Add(AllItems.First(i => i.Key == Settings.DefaultValuable.Value).Value.ValuablePrefabRef);
                 }
                 var smallerItems = valuablePreset.tiny.ToList();
                 
@@ -131,12 +131,12 @@ namespace SpawnManager.Managers
             }
         }
 
-        private static void RemoveValuableObjectsFromList(List<GameObject> list, List<ValuableObject> valuableObjectsToRemove)
+        private static void RemoveValuableObjectsFromList(List<PrefabRef> list, List<ValuableObject> valuableObjectsToRemove)
         {
             var originalCount = list.Count;
-            foreach (var obj in list.ToList().Where(obj => valuableObjectsToRemove.Contains(obj.GetComponent<ValuableObject>())))
+            foreach (var obj in list.ToList().Where(obj => valuableObjectsToRemove.Contains(obj.Prefab.GetComponent<ValuableObject>())))
             {
-                Settings.Logger.LogDebug($"Removed valuable object {obj.name} from list.");
+                Settings.Logger.LogDebug($"Removed valuable object {obj.Prefab.name} from list.");
                 // TODO RemovedList.TryAdd(key, obj);
                 list.Remove(obj);
             }
@@ -168,16 +168,16 @@ namespace SpawnManager.Managers
             }
         }
 
-        private static void RestoreValuableObjectsFromList(List<GameObject> list, string valuablePresetName, ValuablePresetType type)
+        private static void RestoreValuableObjectsFromList(List<PrefabRef> list, string valuablePresetName, ValuablePresetType type)
         {
             var restoredValuables = new List<string>();
             foreach (var obj in AllItems.Values.Where(
                          meta => meta.PresetType == type 
                                  && meta.ValuablePresetName == valuablePresetName
-                                 && !list.Contains(meta.ValuableGameObject)))
+                                 && !list.Contains(meta.ValuablePrefabRef)))
             {
-                restoredValuables.Add(obj.ValuableGameObject.name);
-                list.Add(obj.ValuableGameObject);
+                restoredValuables.Add(obj.ValuablePrefabRef.Prefab.name);
+                list.Add(obj.ValuablePrefabRef);
             }
             
             // Don't log if nothing was restored.
@@ -238,13 +238,13 @@ namespace SpawnManager.Managers
 
         public static Dictionary<string, ValuableMetaData> AllItems = new Dictionary<string, ValuableMetaData>();
 
-        static void AddItemsToDictionary(List<GameObject> list, string valuablePresetName, ValuablePresetType type)
+        static void AddItemsToDictionary(List<PrefabRef> list, string valuablePresetName, ValuablePresetType type)
         {
             foreach (var item in list)
             {
                 if (item != null)
                 {
-                    AllItems.TryAdd(item.name, new ValuableMetaData(item, valuablePresetName, type));
+                    AllItems.TryAdd(item.Prefab.name, new ValuableMetaData(item, valuablePresetName, type));
                 }
             }
         }
@@ -252,14 +252,14 @@ namespace SpawnManager.Managers
     
     public class ValuableMetaData
     {
-        public ValuableMetaData(GameObject valuable, string valuablePresetName, ValuableManager.ValuablePresetType presetType)
+        public ValuableMetaData(PrefabRef valuable, string valuablePresetName, ValuableManager.ValuablePresetType presetType)
         {
-            ValuableGameObject = valuable;
+            ValuablePrefabRef = valuable;
             ValuablePresetName = valuablePresetName;
             PresetType = presetType;
         }
 
-        public GameObject ValuableGameObject { get; set; }
+        public PrefabRef ValuablePrefabRef { get; set; }
         public string ValuablePresetName { get; set; }
         public ValuableManager.ValuablePresetType PresetType { get; set; }
     }
