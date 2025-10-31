@@ -1,4 +1,5 @@
-﻿using HarmonyLib;
+﻿using System;
+using HarmonyLib;
 using SpawnManager.Managers;
 
 namespace SpawnManager.Patches
@@ -12,13 +13,20 @@ namespace SpawnManager.Patches
         [HarmonyPriority(Priority.Last)]
         static void RunManagerAwakePrefix()
         {
-            if (SemiFunc.MenuLevel())
+            try
             {
-                return;
-            }
+                if (SemiFunc.MenuLevel())
+                {
+                    return;
+                }
 
-            Settings.Logger.LogDebug("Removing valuables.");
-            ValuableManager.RemoveValuables();
+                Settings.Logger.LogDebug("Removing valuables.");
+                ValuableManager.RemoveValuables();
+            }
+            catch (Exception)
+            {
+                Settings.Logger.LogInfo("Failed to determine if it is the menu level.");
+            }
         }
         
         [HarmonyPatch(nameof(RunManager.SetRunLevel))]

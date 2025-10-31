@@ -6,7 +6,7 @@ namespace SpawnManager.Managers
 {
     public static class EnemyManager
     {
-        public static Dictionary<string, IEnumerable<GameObject>> EnemySpawnList = new Dictionary<string, IEnumerable<GameObject>>();
+        public static Dictionary<string, IEnumerable<PrefabRef>> EnemySpawnList = new Dictionary<string, IEnumerable<PrefabRef>>();
             
         public static void RefreshAllEnemyNames()
         {
@@ -14,10 +14,10 @@ namespace SpawnManager.Managers
             
             EnemySpawnList =  director.enemiesDifficulty1.Concat(director.enemiesDifficulty2).Concat(director.enemiesDifficulty3)
                 .SelectMany(ed => ed.spawnObjects)
-                .GroupBy(so => so.GetInstanceID())
+                .GroupBy(so => so.Prefab.GetInstanceID())
                 .Select(so => so.First())
-                .Where(so => so.GetComponent<EnemyParent>() != null)
-                .GroupBy(so => so.GetComponent<EnemyParent>().enemyName)
+                .Where(so => so.Prefab.GetComponent<EnemyParent>() != null)
+                .GroupBy(so => so.Prefab.GetComponent<EnemyParent>().enemyName)
                 .ToDictionary(g => g.Key, g => g.AsEnumerable());
         }
 
