@@ -1,3 +1,6 @@
+## 0.6.0
+- Support for the Monster Update.
+ 
 ## 0.5.5
 - Added per-level valuables to the Spawn Manager menu.
 
