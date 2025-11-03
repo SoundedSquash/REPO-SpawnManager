@@ -50,7 +50,7 @@ namespace SpawnManager.Managers
             
             var setupsToRemove = director
                 .enemiesDifficulty1.Concat(director.enemiesDifficulty2).Concat(director.enemiesDifficulty3)
-                .Where(s => s.spawnObjects.Any(so => spawnObjectsToRemove.Contains(so)))
+                .Where(s => s.spawnObjects.Any(so => spawnObjectsToRemove.Any(removeRef => removeRef.Prefab == so.Prefab)))
                 .ToList();
             // Use reverse loop to avoid InvalidOperationException when removing items from a list while iterating over it.
             for (var i = setupsToRemove.Count - 1; i >= 0; i--)
