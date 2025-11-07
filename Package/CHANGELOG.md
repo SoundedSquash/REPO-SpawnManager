@@ -1,3 +1,9 @@
+## 0.6.2
+- Minor bug fix that could cause the level not to load.
+
+## 0.6.1
+- Fix bug with enemy group spawns.
+
 ## 0.6.0
 - Support for the Monster Update.
  
