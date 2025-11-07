@@ -181,7 +181,7 @@ namespace SpawnManager
         {
             if (string.IsNullOrEmpty(str))
                 return new List<string>();
-            return new List<string>(str.Split(',', System.StringSplitOptions.RemoveEmptyEntries));
+            return new List<string>(str.Split(',', System.StringSplitOptions.RemoveEmptyEntries).Select(s => s.Trim()));
         }
 
         public static void UpdateSettingsListEntry(ConfigEntry<string> settingsVariable, string entry, bool enabled)

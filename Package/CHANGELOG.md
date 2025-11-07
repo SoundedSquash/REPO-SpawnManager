@@ -1,3 +1,6 @@
+## 0.6.3
+- Read disabled name settings more consistently (ignore spaces around the values).
+
 ## 0.6.2
 - Minor bug fix that could cause the level not to load.
 
