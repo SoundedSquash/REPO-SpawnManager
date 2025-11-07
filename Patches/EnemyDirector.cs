@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using HarmonyLib;
 using SpawnManager.Managers;
 using UnityEngine;
@@ -39,18 +40,18 @@ namespace SpawnManager.Patches
         [HarmonyPrefix]
         static void EnemyDirectorGetEnemyPrefix(EnemyDirector __instance, ref List<EnemySetup> ___enemyList, int ___enemyListIndex)
         {
-            if (!_isListSet) // Only run once.
-            {
-                _startingEnemyList = new List<EnemySetup>(___enemyList);
-                _isListSet = true;
-            }
-            
             // Make sure at least one "enemy" exists.
             if (___enemyList.Count == 0)
             {
                 var emptyEnemySetup = ScriptableObject.CreateInstance<EnemySetup>();
                 emptyEnemySetup.spawnObjects = new List<PrefabRef>();
                 ___enemyList.Add(emptyEnemySetup);
+            }
+            
+            if (!_isListSet) // Only run once.
+            {
+                _startingEnemyList = new List<EnemySetup>(___enemyList);
+                _isListSet = true;
             }
 
             // Make sure the enemy list is long enough to prevent index out of range.
