@@ -10,7 +10,7 @@ namespace SpawnManager.Patches
         /// <summary>
         /// Override the path if we injected other objects to spawn for other sizes.
         /// </summary>
-        [HarmonyPatch("Spawn")]
+        [HarmonyPatch("SpawnValuable")]
         [HarmonyPrefix]
         static void ValuableDirectorSpawnPrefix(GameObject _valuable, ValuableVolume _volume, ref string _path)
         {
