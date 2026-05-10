@@ -1,3 +1,9 @@
+## 0.6.5
+- Fix empty Shop Items lists.
+
+## 0.6.4
+- Support for REPO v0.4.0. Fixed loading errors.
+
 ## 0.6.3
 - Read disabled name settings more consistently (ignore spaces around the values).
 

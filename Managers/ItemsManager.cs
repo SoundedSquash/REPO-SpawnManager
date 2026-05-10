@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using HarmonyLib;
 using SpawnManager.Extensions;
 
 namespace SpawnManager.Managers
@@ -18,10 +19,9 @@ namespace SpawnManager.Managers
         {
             // Restore all items so different levels can disable only their items.
             RestoreItems();
+            Traverse.Create(StatsManager.instance).Method("LoadItemsFromFolder").GetValue();
             
             if (SemiFunc.IsNotMasterClient()) return;
-            if (!StatsManagerItemDictionaryIsAvailable) return;
-            if (StatsManager.instance.itemDictionary.Count == 0) return;
             
             List<string> disabledItemNames = Settings.GetDisabledSettingsEntryListNames(Settings.DisabledItems);
             
@@ -32,7 +32,15 @@ namespace SpawnManager.Managers
                 var disabledItemNamesForLevel = Settings.GetDisabledItemsForLevel(currentLevelName);
                 disabledItemNames.AddRange(disabledItemNamesForLevel);
             }
+            
+            if (!StatsManagerItemDictionaryIsAvailable) return;
+            if (StatsManager.instance.itemDictionary.Count == 0) return;
 
+            StatsManager.instance.item.Where(keyValuePair => disabledItemNames.Contains(keyValuePair.Key.ToItemFriendlyName())).ToList().ForEach(keyValuePair =>
+            {
+                StatsManager.instance.item.Remove(keyValuePair.Key);
+            });
+                
             StatsManager.instance.itemDictionary.Where(keyValuePair => disabledItemNames.Contains(keyValuePair.Key.ToItemFriendlyName())).ToList().ForEach(keyValuePair =>
             {
                 Settings.Logger.LogDebug($"Removed item {keyValuePair.Key.ToItemFriendlyName()}.");

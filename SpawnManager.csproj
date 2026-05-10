@@ -3,12 +3,15 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.1</TargetFramework>
         <Nullable>enable</Nullable>
-        <Version>0.6.3</Version>
+        <Version>0.6.5</Version>
         <GamePathDir>C:\Program Files (x86)\Steam\steamapps\common\REPO</GamePathDir>
         <GameDataDir>$([System.IO.Directory]::GetDirectories("$(GamePathDir)", "*_Data")[0])</GameDataDir>
         <ManagedDir>$(GameDataDir)\Managed</ManagedDir>
         <BepInExDir>$(GamePathDir)\BepInEx</BepInExDir>
         <ProjectDir>$(MSBuildThisFileDirectory)</ProjectDir>
+        <Configurations>Debug;Release;Unity</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <OutputType>Library</OutputType>
     </PropertyGroup>
 
     <ItemGroup>
@@ -66,10 +69,18 @@
 
     <PropertyGroup>
         <ModTestDir>$(BepInExDir)\plugins\$(AssemblyName)\</ModTestDir>
+        <ModManagerProfileDir>C:\Users\kanst\AppData\Roaming\com.kesomannen.gale\repo\profiles\Spawn Manager\BepInEx\plugins\soundedsquash-Enemy_And_Valuable_Spawn_Manager\</ModManagerProfileDir>
+        <UnityTestDir>C:\Users\kanst\REPO Local\REPO\BepInEx\plugins\$(AssemblyName)\</UnityTestDir>
     </PropertyGroup>
     <Target Name="CopyToBepInExPlugins" AfterTargets="Build" Condition=" '$(Configuration)' == 'Debug' ">
         <Copy SourceFiles="$(OutDir)$(AssemblyName).dll" DestinationFolder="$(ModTestDir)" OverwriteReadOnlyFiles="true" />
-        <Copy SourceFiles="$(OutDir)$(AssemblyName).pdb" DestinationFolder="$(ModTestDir)" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(OutDir)$(AssemblyName).dll" DestinationFolder="$(ModManagerProfileDir)" OverwriteReadOnlyFiles="true" />
         <Message Text="Copied $(AssemblyName).dll/.pdb to $(ModTestDir)" Importance="High"/>
+    </Target>
+    
+    <Target Name="CopyToBepInExPluginsUnity" AfterTargets="Build" Condition=" '$(Configuration)' == 'Unity' ">
+        <Copy SourceFiles="$(OutDir)$(AssemblyName).dll" DestinationFolder="$(UnityTestDir)" OverwriteReadOnlyFiles="true" />
+        <Copy SourceFiles="$(OutDir)$(AssemblyName).pdb" DestinationFolder="$(UnityTestDir)" OverwriteReadOnlyFiles="true" />
+        <Message Text="Copied $(AssemblyName).dll/.pdb to $(UnityTestDir)" Importance="High"/>
     </Target>
 </Project>

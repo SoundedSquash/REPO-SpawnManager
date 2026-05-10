@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace SpawnManager.Managers
 {
@@ -16,8 +17,13 @@ namespace SpawnManager.Managers
             var levels = GetAllLevels();
             if (RunManagerLevelVariableIsAvailable)
             {
-                levels.AddRange(RunManager.instance.levelShop);
-                levels.AddRange(RunManager.instance.levelArena);
+                // Preserve original level names for grouping and for config compatibility.
+                var fakeShop = ScriptableObject.CreateInstance<Level>();
+                fakeShop.name = "Shop";
+                var fakeArena = ScriptableObject.CreateInstance<Level>();
+                fakeArena.name = "Arena";
+                levels.Add(fakeShop);
+                levels.Add(fakeArena);
             }
             return levels;
         }
