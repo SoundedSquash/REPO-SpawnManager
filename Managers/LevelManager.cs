@@ -12,6 +12,10 @@ namespace SpawnManager.Managers
 
         public static List<Level> GetAllLevels() => _removedList.Concat(RunManager.instance.levels).ToList();
 
+        public static List<Level> GetAllArenaLevels() => _removedList.Concat(RunManager.instance.levelArena).ToList();
+
+        public static List<Level> GetAllShopLevels() => _removedList.Concat(RunManager.instance.levelShop).ToList();
+
         public static IEnumerable<Level> GetAllLevelsForItems()
         {
             var levels = GetAllLevels();

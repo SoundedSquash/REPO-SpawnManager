@@ -555,7 +555,9 @@ namespace SpawnManager.Managers
                                     () =>
                                     {
                                         Settings.DisabledLevels.Value = string.Join(',',
-                                            LevelManager.GetAllLevels().Select(l => l.name));
+                                            LevelManager.GetAllLevels().Select(l => l.name)
+                                            .Concat(LevelManager.GetAllArenaLevels().Select(l => l.name).Skip(1)) // Keep one
+                                            .Concat(LevelManager.GetAllShopLevels().Select(l => l.name).Skip(1))); // Keep one
                                         
                                         // Reopen page to refresh
                                         _currentPageButton = null;
@@ -566,16 +568,31 @@ namespace SpawnManager.Managers
                     );
                     
                     var levelsList = LevelManager.GetAllLevels().OrderBy(vo => vo.name);
+                    var arenasList = LevelManager.GetAllArenaLevels().OrderBy(vo => vo.name);
+                    var shopsList = LevelManager.GetAllShopLevels().OrderBy(vo => vo.name);
         
+                    // REGULAR LEVELS
                     foreach (var level in levelsList)
                     {
-                        levelPage.AddElementToScrollView(levelPageParent =>
-                        {
-                            return MenuAPI.CreateREPOToggle(level.FriendlyName(),
-                                b => { Settings.UpdateSettingsListEntry(Settings.DisabledLevels, level.name, b); },
-                                levelPageParent, default, "ON", "OFF",
-                                Settings.IsSettingsListEntryEnabled(Settings.DisabledLevels, level.name)).rectTransform;
-                        });
+                        levelPage.AddElementToScrollView(levelPageParent => AddLevelOption(level, levelPageParent));
+                    }
+                    
+                    // ARENAS
+                    levelPage.AddElementToScrollView(levelPageParent => 
+                        MenuAPI.CreateREPOLabel("Arenas (keep one)", levelPageParent).rectTransform);
+                    
+                    foreach (var level in arenasList)
+                    {
+                        levelPage.AddElementToScrollView(levelPageParent => AddLevelOption(level, levelPageParent));
+                    }
+                    
+                    // SHOPS
+                    levelPage.AddElementToScrollView(levelPageParent => 
+                        MenuAPI.CreateREPOLabel("Shops (keep one)", levelPageParent).rectTransform);
+                    
+                    foreach (var level in shopsList)
+                    {
+                        levelPage.AddElementToScrollView(levelPageParent => AddLevelOption(level, levelPageParent));
                     }
         
                     _currentPageButton = button;
@@ -588,6 +605,12 @@ namespace SpawnManager.Managers
             
             levelButton = localButton;
         }
+        
+        private static RectTransform AddLevelOption(Level level, Transform parent) => 
+            MenuAPI.CreateREPOToggle(level.FriendlyName(),
+            b => { Settings.UpdateSettingsListEntry(Settings.DisabledLevels, level.name, b); },
+            parent, default, "ON", "OFF",
+            Settings.IsSettingsListEntryEnabled(Settings.DisabledLevels, level.name)).rectTransform;
 
         private static void CreateSubMenuItems(REPOPopupPage menu)
         {

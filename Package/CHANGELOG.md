@@ -1,3 +1,6 @@
+## 0.6.6
+- Add ability to disable shop and arena variants.
+
 ## 0.6.5
 - Fix empty Shop Items lists.
 
