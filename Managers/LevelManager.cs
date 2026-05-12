@@ -9,6 +9,9 @@ namespace SpawnManager.Managers
         private static List<Level> _removedList = new List<Level>();
         private static List<Level> _removedListArena = new List<Level>();
         private static List<Level> _removedListShop = new List<Level>();
+        
+        public const string GenericArenaLevelName = "Arena";
+        public const string GenericShopLevelName = "Shop";
 
         public static bool RunManagerLevelVariableIsAvailable => RunManager.instance != null && RunManager.instance.levels != null;
 
@@ -25,9 +28,9 @@ namespace SpawnManager.Managers
             {
                 // Preserve original level names for grouping and for config compatibility.
                 var fakeShop = ScriptableObject.CreateInstance<Level>();
-                fakeShop.name = "Shop";
+                fakeShop.name = GenericShopLevelName;
                 var fakeArena = ScriptableObject.CreateInstance<Level>();
-                fakeArena.name = "Arena";
+                fakeArena.name = GenericArenaLevelName;
                 levels.Add(fakeShop);
                 levels.Add(fakeArena);
             }
@@ -108,8 +111,8 @@ namespace SpawnManager.Managers
             var disabledLevelNames = Settings.GetDisabledSettingsEntryListNames(Settings.DisabledLevels);
             // Valid if at least one level is not removed.
             return RunManager.instance.levels.Any(l => !disabledLevelNames.Contains(l.name))
-                || RunManager.instance.levelArena.Any(l => !disabledLevelNames.Contains(l.name))
-                || RunManager.instance.levelShop.Any(l => !disabledLevelNames.Contains(l.name));
+                && RunManager.instance.levelArena.Any(l => !disabledLevelNames.Contains(l.name))
+                && RunManager.instance.levelShop.Any(l => !disabledLevelNames.Contains(l.name));
         } 
     }
 }

@@ -29,6 +29,10 @@ namespace SpawnManager.Managers
 
             if (currentLevelName != null)
             {
+                // Overrides for generic shop/arena to cover variants
+                if (SemiFunc.RunIsShop()) currentLevelName = LevelManager.GenericShopLevelName;
+                else if(SemiFunc.RunIsArena()) currentLevelName = LevelManager.GenericArenaLevelName;
+                
                 var disabledItemNamesForLevel = Settings.GetDisabledItemsForLevel(currentLevelName);
                 disabledItemNames.AddRange(disabledItemNamesForLevel);
             }

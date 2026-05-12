@@ -68,7 +68,7 @@ namespace SpawnManager.Managers
                         if (!LevelManager.IsValid())
                         {
                             MenuAPI.OpenPopup("Invalid Levels", Color.red,
-                                "Please make sure you have at least one level enabled. Would you like to edit the selections now?",
+                                "Please make sure you have at least one level enabled in each category. Would you like to edit the selections now?",
                                 () =>
                                 {
                                     levelButton.onClick.Invoke();
@@ -556,8 +556,8 @@ namespace SpawnManager.Managers
                                     {
                                         Settings.DisabledLevels.Value = string.Join(',',
                                             LevelManager.GetAllLevels().Select(l => l.name)
-                                            .Concat(LevelManager.GetAllArenaLevels().Select(l => l.name).Skip(1)) // Keep one
-                                            .Concat(LevelManager.GetAllShopLevels().Select(l => l.name).Skip(1))); // Keep one
+                                            .Concat(LevelManager.GetAllArenaLevels().Select(l => l.name))
+                                            .Concat(LevelManager.GetAllShopLevels().Select(l => l.name)));
                                         
                                         // Reopen page to refresh
                                         _currentPageButton = null;
