@@ -355,7 +355,7 @@ namespace SpawnManager.Managers
                     {
                         return MenuAPI.CreateREPOSlider("Default Valuable",
                             "This is used when not enough valuables are enabled for certain sizes. Only tiny items are allowed.",
-                            onOptionChanged: stringValue =>
+                            onOptionChanged: (string stringValue) =>
                             {
                                 Settings.DefaultValuable.Value = stringValue;
                             },

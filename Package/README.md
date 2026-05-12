@@ -6,7 +6,7 @@ Enemies can be disabled on a per-level basis. An example of how this works:
 - Enemy enabled in global config and disabled on Level - Manor: enemy will not spawn in the Manor level
 - Enemy disabled in global config and enabled on Level - Manor: enemy will not spawn in any level
 
-Only the host needs the mod for multiplayer. The host determines which enemies/valuables are enabled.\
+Only the host needs the mod for multiplayer. The host determines which enemies, valuables, shop items, and levels are enabled.\
 If you are not the host, this mod is ignored.
 
 ### Features
