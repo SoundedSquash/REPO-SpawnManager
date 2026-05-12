@@ -7,14 +7,16 @@ namespace SpawnManager.Managers
     public static class LevelManager
     {
         private static List<Level> _removedList = new List<Level>();
+        private static List<Level> _removedListArena = new List<Level>();
+        private static List<Level> _removedListShop = new List<Level>();
 
         public static bool RunManagerLevelVariableIsAvailable => RunManager.instance != null && RunManager.instance.levels != null;
 
         public static List<Level> GetAllLevels() => _removedList.Concat(RunManager.instance.levels).ToList();
 
-        public static List<Level> GetAllArenaLevels() => _removedList.Concat(RunManager.instance.levelArena).ToList();
+        public static List<Level> GetAllArenaLevels() => _removedListArena.Concat(RunManager.instance.levelArena).ToList();
 
-        public static List<Level> GetAllShopLevels() => _removedList.Concat(RunManager.instance.levelShop).ToList();
+        public static List<Level> GetAllShopLevels() => _removedListShop.Concat(RunManager.instance.levelShop).ToList();
 
         public static IEnumerable<Level> GetAllLevelsForItems()
         {
@@ -45,6 +47,20 @@ namespace SpawnManager.Managers
                 _removedList.Add(level);
                 RunManager.instance.levels.Remove(level);
             });
+
+            RunManager.instance.levelArena.Where(l => disabledLevelNames.Contains(l.name)).ToList().ForEach(level =>
+            {
+                Settings.Logger.LogDebug($"Removed level {level.name}.");
+                _removedListArena.Add(level);
+                RunManager.instance.levelArena.Remove(level);
+            });
+
+            RunManager.instance.levelShop.Where(l => disabledLevelNames.Contains(l.name)).ToList().ForEach(level =>
+            {
+                Settings.Logger.LogDebug($"Removed level {level.name}.");
+                _removedListShop.Add(level);
+                RunManager.instance.levelShop.Remove(level);
+            });
             
             // TODO Fix this to actually return to main menu. Or prevent leaving settings page so this can't happen.
             if (RunManager.instance.levels.Count == 0)
@@ -57,7 +73,7 @@ namespace SpawnManager.Managers
         public static void RestoreLevels()
         {
             if (!RunManagerLevelVariableIsAvailable) return;
-            if (_removedList.Count == 0) return;
+            if (_removedList.Count == 0 && _removedListArena.Count == 0 && _removedListShop.Count == 0) return;
 
             for (var i = _removedList.Count - 1; i >= 0; i--)
             {
@@ -66,6 +82,22 @@ namespace SpawnManager.Managers
                 RunManager.instance.levels.Add(level);
                 _removedList.RemoveAt(i);
             }
+
+            for (var i = _removedListArena.Count - 1; i >= 0; i--)
+            {
+                var level = _removedListArena[i];
+                Settings.Logger.LogDebug($"Restored level {level.name}.");
+                RunManager.instance.levelArena.Add(level);
+                _removedListArena.RemoveAt(i);
+            }
+
+            for (var i = _removedListShop.Count - 1; i >= 0; i--)
+            {
+                var level = _removedListShop[i];
+                Settings.Logger.LogDebug($"Restored level {level.name}.");
+                RunManager.instance.levelShop.Add(level);
+                _removedListShop.RemoveAt(i);
+            }
         }
 
         /// <summary>
@@ -73,8 +105,11 @@ namespace SpawnManager.Managers
         /// </summary>
         public static bool IsValid()
         {
+            var disabledLevelNames = Settings.GetDisabledSettingsEntryListNames(Settings.DisabledLevels);
             // Valid if at least one level is not removed.
-            return RunManager.instance.levels.Any(l => !Settings.GetDisabledSettingsEntryListNames(Settings.DisabledLevels).Contains(l.name));
+            return RunManager.instance.levels.Any(l => !disabledLevelNames.Contains(l.name))
+                || RunManager.instance.levelArena.Any(l => !disabledLevelNames.Contains(l.name))
+                || RunManager.instance.levelShop.Any(l => !disabledLevelNames.Contains(l.name));
         } 
     }
 }

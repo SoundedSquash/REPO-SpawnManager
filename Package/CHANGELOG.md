@@ -1,3 +1,6 @@
+## 0.6.7
+- Fix bug where disabling shops and arenas wasn't working.
+
 ## 0.6.6
 - Add ability to disable shop and arena variants.
 

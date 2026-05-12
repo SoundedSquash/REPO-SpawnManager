@@ -29,7 +29,7 @@ namespace SpawnManager.Patches
             }
         }
         
-        [HarmonyPatch(nameof(RunManager.SetRunLevel))]
+        [HarmonyPatch(nameof(RunManager.ChangeLevel))]
         [HarmonyPrefix]
         static void RunManagerChangeLevelPrefix(RunManager __instance, ref Level ___previousRunLevel)
         {
