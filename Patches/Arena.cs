@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Reflection.Emit;
 using HarmonyLib;
 using SpawnManager.Extensions;
 using SpawnManager.Managers;
@@ -9,9 +11,7 @@ namespace SpawnManager.Patches
     [HarmonyPatch(nameof(Arena))]
     public class ArenaPatches
     {
-        [HarmonyPatch(typeof(Arena), "ArenaInitMultiplayer")]
-        [HarmonyPrefix]
-        public static void ArenaInitMultiplayerPrefix(Arena __instance)
+        public static void ClearItems()
         {
             if (SemiFunc.IsNotMasterClient()) return;
             
@@ -19,12 +19,34 @@ namespace SpawnManager.Patches
             var disabledItemNamesForLevel = Settings.GetDisabledItemsForLevel(LevelManager.GenericArenaLevelName);
             disabledItemNames.AddRange(disabledItemNamesForLevel);
             
-            __instance.itemsMelee.RemoveItems(disabledItemNames);
-            __instance.itemsGuns.RemoveItems(disabledItemNames);
-            __instance.itemsCarts.RemoveItems(disabledItemNames);
-            __instance.itemsDronesAndOrbs.RemoveItems(disabledItemNames);
-            __instance.itemsHealth.RemoveItems(disabledItemNames);
-            __instance.itemsUsables.RemoveItems(disabledItemNames);
+            ItemManager.instance.purchasedItems.RemoveItems(disabledItemNames);
+        }
+
+        [HarmonyPatch(typeof(Arena), "ArenaInitMultiplayer")]
+        [HarmonyTranspiler]
+        static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions)
+        {
+            var codes = new List<CodeInstruction>(instructions);
+
+            var targetMethod = AccessTools.Method(typeof(ItemManager), nameof(ItemManager.GetAllItemVolumesInScene));
+            var clearItemsMethod = AccessTools.Method(typeof(ArenaPatches), nameof(ClearItems));
+
+            for (int i = 0; i < codes.Count; i++)
+            {
+                if (codes[i].opcode == OpCodes.Callvirt &&
+                    codes[i].operand is MethodInfo method &&
+                    method == targetMethod)
+                {
+                    codes.InsertRange(i, new[]
+                    {
+                        new CodeInstruction(OpCodes.Call, clearItemsMethod)
+                    });
+
+                    return codes;
+                }
+            }
+
+            throw new Exception("Could not find GetAllItemVolumesInScene");
         }
     }
 }
