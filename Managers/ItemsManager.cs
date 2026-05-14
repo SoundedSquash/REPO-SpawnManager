@@ -22,6 +22,7 @@ namespace SpawnManager.Managers
             Traverse.Create(StatsManager.instance).Method("LoadItemsFromFolder").GetValue();
             
             if (SemiFunc.IsNotMasterClient()) return;
+            if (SemiFunc.RunIsArena()) return;
             
             List<string> disabledItemNames = Settings.GetDisabledSettingsEntryListNames(Settings.DisabledItems);
             
@@ -31,7 +32,6 @@ namespace SpawnManager.Managers
             {
                 // Overrides for generic shop/arena to cover variants
                 if (SemiFunc.RunIsShop()) currentLevelName = LevelManager.GenericShopLevelName;
-                else if(SemiFunc.RunIsArena()) currentLevelName = LevelManager.GenericArenaLevelName;
                 
                 var disabledItemNamesForLevel = Settings.GetDisabledItemsForLevel(currentLevelName);
                 disabledItemNames.AddRange(disabledItemNamesForLevel);
@@ -44,7 +44,7 @@ namespace SpawnManager.Managers
             {
                 StatsManager.instance.item.Remove(keyValuePair.Key);
             });
-                
+            
             StatsManager.instance.itemDictionary.Where(keyValuePair => disabledItemNames.Contains(keyValuePair.Key.ToItemFriendlyName())).ToList().ForEach(keyValuePair =>
             {
                 Settings.Logger.LogDebug($"Removed item {keyValuePair.Key.ToItemFriendlyName()}.");
