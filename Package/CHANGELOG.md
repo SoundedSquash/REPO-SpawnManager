@@ -1,12 +1,15 @@
+## 0.6.9
+- Fixed a bug where disabled shop items were still enabled for arenas.
+
 ## 0.6.8
 - Shop items are disabled correctly again for shop and arena. All variants share the same list.
 - Update UI validation to Level settings.
 
 ## 0.6.7
-- Fix bug where disabling shops and arenas wasn't working.
+- Fixed a bug where disabling shops and arenas wasn't working.
 
 ## 0.6.6
-- Add ability to disable shop and arena variants.
+- Added the ability to disable shop and arena variants.
 
 ## 0.6.5
 - Fix empty Shop Items lists.
