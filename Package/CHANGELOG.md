@@ -1,3 +1,6 @@
+## 0.7.1
+- Fixed a bug where shop items were not showing up in the truck after being purchased. Thanks [Justin-dr](https://github.com/Justin-dr).
+
 ## 0.7.0
 - Fixed a bug where shop items from mods were not showing up in the list to enable/disable.
 
