@@ -13,8 +13,18 @@ namespace SpawnManager.Managers
 
         private static bool StatsManagerItemDictionaryIsAvailable => StatsManager.instance != null && StatsManager.instance.itemDictionary != null;
 
-        public static Dictionary<string, Item> GetAllItems() => _removedList.Concat(StatsManager.instance.itemDictionary)
-            .ToDictionary(pair => pair.Key, pair => pair.Value);
+        public static Dictionary<string, Item> GetAllItems()
+        {
+            IEnumerable<KeyValuePair<string, Item>> items = StatsManagerItemDictionaryIsAvailable
+                ? StatsManager.instance.itemDictionary
+                : Enumerable.Empty<KeyValuePair<string, Item>>();
+
+            return items
+                .Concat(_removedList)
+                .Concat(GetRepoLibItems().Select(item => new KeyValuePair<string, Item>(item.name, item)))
+                .GroupBy(pair => pair.Key)
+                .ToDictionary(group => group.Key, group => group.First().Value);
+        }
 
         public static void RemoveItems()
         {
@@ -57,7 +67,6 @@ namespace SpawnManager.Managers
         public static void RestoreItems()
         {
             if (!StatsManagerItemDictionaryIsAvailable) return;
-            RegisterRepoLibItems();
             if (_removedList.Count == 0) return;
 
             for (var i = _removedList.Count - 1; i >= 0; i--)
@@ -69,18 +78,29 @@ namespace SpawnManager.Managers
             }
         }
         
-        private static void RegisterRepoLibItems()
+        private static IEnumerable<Item> GetRepoLibItems()
         {
-            if (!PluginManager.IsPluginInstalled(Constants.RepoLibGuid)) return;
+            if (!PluginManager.IsPluginInstalled(Constants.RepoLibGuid)) return Enumerable.Empty<Item>();
+
+            var itemsTraverse = CreateRepoLibItemTraverse();
             
-            var repoAsm = AppDomain.CurrentDomain
+            if (itemsTraverse == null) return Enumerable.Empty<Item>();
+            
+            // This private field never seems to be cleared and always has all REPOLib's items.
+            return itemsTraverse
+                .Field("_itemsToRegister")
+                .GetValue<IEnumerable<Item>>() ?? Enumerable.Empty<Item>();
+        }
+
+        private static Traverse? CreateRepoLibItemTraverse()
+        {
+            var repoAssembly = AppDomain.CurrentDomain
                 .GetAssemblies()
-                .FirstOrDefault(a => a.GetName().Name == "REPOLib");
-            if (repoAsm == null) return;
+                .FirstOrDefault(assembly => assembly.GetName().Name == "REPOLib");
+
+            var itemsType = repoAssembly?.GetType("REPOLib.Modules.Items");
             
-            var repoLibItemsType = repoAsm.GetType("REPOLib.Modules.Items");
-            var repoLibItems = Traverse.Create(repoLibItemsType);
-            repoLibItems.Method("RegisterItems").GetValue();
+            return itemsType == null ? null : Traverse.Create(itemsType);
         }
     }
 }
