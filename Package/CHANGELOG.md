@@ -1,3 +1,6 @@
+## 0.7.3
+- Update description for REPO v0.5.0.
+
 ## 0.7.2
 - Fixed an issue where valuables were not spawning correctly.
 - Moved button on main menu to avoid Socials overlap.
