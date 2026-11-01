@@ -23,7 +23,7 @@ namespace SpawnManager.Managers
             _mainMenuButton = MenuAPI.CreateREPOButton("Spawn Manager",
                 () => CreatePopup().OpenPage(false),
                 parent,
-                new Vector2(550f, 22f)
+                new Vector2(563f, 110f)
             );
 
             SetMainMenuButtonVisibility();

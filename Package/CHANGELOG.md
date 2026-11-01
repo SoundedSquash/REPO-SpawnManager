@@ -1,3 +1,8 @@
+## 0.7.2
+- Fixed an issue where valuables were not spawning correctly.
+- Moved button on main menu to avoid Socials overlap.
+- Updated MenuLib dependency to 2.5.0.
+
 ## 0.7.1
 - Fixed a bug where shop items were not showing up in the truck after being purchased. Thanks [Justin-dr](https://github.com/Justin-dr).
 
