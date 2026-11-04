@@ -30,7 +30,7 @@ namespace SpawnManager.Managers
         {
             // Restore all items so different levels can disable only their items.
             RestoreItems();
-            Traverse.Create(StatsManager.instance).Method("LoadItemsFromFolder").GetValue();
+            if (StatsManager.instance.itemDictionary.Count == 0) Traverse.Create(StatsManager.instance).Method("LoadItemsFromFolder").GetValue();
             
             if (SemiFunc.IsNotMasterClient()) return;
             if (SemiFunc.RunIsArena()) return;

@@ -11,7 +11,6 @@ namespace SpawnManager.Patches
         [HarmonyPriority(Priority.Last)]
         static void LevelGeneratorItemSetupPrefix()
         {
-            Settings.Logger.LogDebug("Removing items.");
             Settings.InitializeItemsLevels();
             ItemsManager.RemoveItems();
         }

@@ -1,3 +1,6 @@
+## 0.7.4
+- Fixed modded shop items not spawning in game.
+ 
 ## 0.7.3
 - Update description for REPO v0.5.0.
 
